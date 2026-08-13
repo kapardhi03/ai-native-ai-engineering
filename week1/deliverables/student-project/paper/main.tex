@@ -1,0 +1,92 @@
+% ===========================================================================
+% PLACEHOLDER DOCUMENT CLASS
+%
+% `article` is a stand-in so this file compiles today on a plain TeX install
+% with no extra downloads. It is NOT the submission format.
+%
+% When the IJCAI author kit is in hand, do all of this in one pass:
+%   1. Replace the \documentclass line below with the class/style the author kit
+%      specifies, and drop the kit's .sty and .bst files next to this file.
+%   2. Add the author/affiliation block in the kit's required form.
+%   3. Delete any package below that the kit already loads or forbids.
+%   4. Swap the References block at the bottom for the kit's bibliography
+%      commands, using the kit's .bst style.
+% Do not hand-format anything the kit controls (margins, fonts, headings).
+% ===========================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+% --- Title (required block 1) ----------------------------------------------
+\title{When to Escalate: A Cost-Aware Belief Policy for Conversational Agents
+Under Hidden Intent}
+
+% Author block is deliberately left to the author kit. Fill in on Day 7.
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- Abstract (required block 2) ------------------------------------------
+\begin{abstract}
+% EMPTY. Write this last, after Results and Failure analysis exist. Do not
+% describe a result here that is not in results/.
+\end{abstract}
+
+% ---------------------------------------------------------------------------
+% Seeded problem statement. Verbatim; the only edit is the LaTeX escaping of
+% the set braces (\{ and \}). Do not reword it.
+% ---------------------------------------------------------------------------
+\noindent\textbf{Problem statement.}
+The agent observes an inbound WhatsApp message from a real-estate lead. It must
+select one action from \{answer, ask a qualifying question, hold, escalate to a
+human\} because the lead's true intent and buying-readiness are not known.
+
+% --- Required section blocks 3-12 -----------------------------------------
+
+\section{Introduction}
+% EMPTY
+
+\section{Related work and user discussions}
+% EMPTY. The user-discussion half of this section must trace to rows in
+% ../discussion-record.md.
+
+\section{Agent design}
+% EMPTY
+
+\section{Probability model and decision rule}
+% EMPTY. Must agree with ../decisions/probability-decision-record.md.
+
+\section{Test method}
+% EMPTY
+
+\section{Results}
+% EMPTY. Every number here has to come from a file in ../results/.
+
+\section{Failure analysis}
+% EMPTY
+
+\section{Limitations ethics and human control}
+% EMPTY
+
+\section{Conclusion and new questions}
+% EMPTY
+
+% --- References (required block 12) ---------------------------------------
+% Replace this whole block with the author kit's bibliography commands once
+% references.bib has entries, e.g. the kit's \bibliographystyle followed by
+% \bibliography{references}. Kept as a plain heading for now so the file
+% compiles with an empty references.bib and no \cite commands.
+\section*{References}
+% EMPTY
+
+\end{document}
