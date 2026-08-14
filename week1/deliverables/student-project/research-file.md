@@ -107,10 +107,20 @@ sales lead routing human vs automation cost
 
 ## X accounts
 
-| Account | Why I followed it | What it posts about |
-| --- | --- | --- |
-|  |  |  |
+<!-- Only accounts I have opened and checked. "Active" and the keep/remove reason
+     reflect what I found when I opened the profile, not a pre-made list. Dormant
+     or off-topic accounts are kept in the table with the reason, so the removal
+     is auditable rather than silent. -->
 
+| Account | Handle | Checked on | Active | Relevant to my problem | Keep or remove, and why |
+| --- | --- | --- | --- | --- | --- |
+| Hussein Mozannar | @HsseinMzannar | 14/08/2026 | Yes | Yes | Keep. Learning-to-defer author, now at MS Research; best-matched researcher and most plausibly engageable of the academic set. Follow + attempt one substantive reply. |
+| Jerry Liu | @jerryjliu0 | 14/08/2026 | Yes | Partial | Keep (low expectation). LlamaIndex co-founder; relevant to applied agents/orchestration, but posts product/ecosystem content, not deferral theory. Follow for pulse, not for topical debate. |
+| Yarin Gal | @yaringal | 14/08/2026 | Low (last ~Jul) | Yes (citation) | Keep as citation-follow. Bayesian deep learning / uncertainty; only mildly active, so treat as read-the-work, not a discussion target. |
+| David Sontag | @david_sontag / @layerhealth | 14/08/2026 | Yes | No (current content) | Remove for discussion. Real L2D pedigree but pivoted to health (Layer Health CEO); current feed is medical, not my problem. Cite his past work if used; don't expect topical engagement. |
+| Gomez-Rodriguez | @autreche | 14/08/2026 | Very low | Yes (work) | Remove for discussion, keep for citation. Triage/deferral work is relevant; account rarely active, so no realistic discussion. |
+| Nastaran Okati | @Nastaranokt | 14/08/2026 | No (no content) | Yes (work) | Remove for discussion. Paper verified real on Scholar; X account has no content, so it can't yield a discussion. Cite the paper, not the account. |
+| Balaji Lakshminarayanan | @balajiln | 14/08/2026 | No (last 2022) | Yes (work) | Remove. Calibration/uncertainty work is relevant but account dormant since 2022. Read/cite only. |
 ## Five sources
 
 <!-- Papers, articles, repos, or datasets. Fill a block in only after reading
