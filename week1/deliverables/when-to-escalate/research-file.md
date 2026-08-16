@@ -162,7 +162,7 @@ sales lead routing human vs automation cost
 - Title: Planning and Acting in Partially Observable Stochastic Domains (Kaelbling, Littman & Cassandra)
 - Link: https://people.smp.uq.edu.au/YoniNazarathy/Control4406_2014/resources/KaelblingLittmanCassandra1998.pdf
 - Why it matters here: Grounds belief-as-sufficient-statistic and the intractability of exact POMDP planning, which is the justification for solving myopically rather than planning over belief space.
-- What I took from it: The formal warrant for my scope: full belief-state planning is intractable, so a myopic one-step expected-cost policy is a defensible approximation. It also names the tension I care about — a strict myopic rule undervalues "ask a qualifying question," which is where VOI/EVSI comes in (implement vs. name as future work still open). I do not use RL or an RNN belief; my belief update is explicit.
+- What I took from it: The formal warrant for my scope: full belief-state planning is intractable, so a myopic one-step expected-cost policy is a defensible approximation. It also names the tension I care about, a strict myopic rule undervalues "ask a qualifying question," which is where VOI/EVSI comes in (implement vs. name as future work still open). I do not use RL or an RNN belief; my belief update is explicit.
 <!-- Source 5 is provisional until verified. If it drops, the replacement is
      whichever VOI/EVSI or POMDP reference I actually read: search "Information
      Value Theory Howard 1966" or "expected value of sample information". Do not
