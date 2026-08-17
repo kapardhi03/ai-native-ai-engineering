@@ -175,17 +175,86 @@ sales lead routing human vs automation cost
 
 | # | Question | How I will know it is answered |
 | --- | --- | --- |
-| 1 |  |  |
-| 2 |  |  |
-| 3 |  |  |
+| 1 | Is the belief's probability calibrated enough to threshold on? The belief comes from an LLM, and if it's overconfident the expected-cost math is wrong and automated actions look artificially cheap. | Reliability diagram + ECE computed on my labeled/synthetic cases. Closed when I can say whether the numbers are trustworthy, and if not, that I recalibrated and re-checked. |
+| 2 | Should "ask a qualifying question" be priced by myopic VOI/EVSI, or hand-tuned as a special case? A strict one-step policy structurally undervalues it because its payoff is a better belief next turn, not immediate. | Closed as a decision, not a proof: I state which path I took for Week 1 and why. If I defer VOI to future work, that counts as answered as long as I say so plainly. |
+| 3 | Which error actually costs the most, and by roughly what ratio — missed escalation vs false escalation vs needless question? | Closed when the cost ranking is backed by practitioner input (r/sales) or a stated assumption + sensitivity analysis, not just my intuition. |
+| 4 | Does asking a qualifying question backfire in practice (friction, drop-off, looking robotic)? | Closed by real answers from people who run inbound sales (r/sales), recorded in the discussion record with any design change. |
+| 5 | Is a two-part hidden state (readiness distribution + separate needs-human probability) the right factorization, or does collapsing/adding a dimension change policy cost? | Closed when I've tested whether the factorization changes the policy's cost on my cases; if it doesn't, I prefer the simpler state and say so. |
+| 6 | How do I even measure a missed escalation, given there's no missed-escalation label without a follow-up signal? | Likely closed as "structurally unmeasurable this week." Answered means I've stated the gap clearly: precision is measurable but biased upward, recall/false-negatives are not. |
+| 7 | What is a baseline I can actually defend as "what a reasonable person would ship" (confidence-threshold-without-cost / always-answer / LLM-picks-action-directly)? | Closed when the baseline is chosen, justified in one line, and used in the experiment. |
+| 8 | For a single first inbound message, is there enough signal to justify a belief, or does the hidden state only firm up as the conversation develops? | Partially closable via discussion (r/LanguageTechnology, r/sales) + my own cases. Answered means I can state whether single-message belief is worth it or whether this is really multi-turn. |
 
 ## AI prompts and important AI errors
 
 ### Prompts used
 
-<!-- The prompt text, the tool it went to, and what it was for. Keep the
-     prompts that mattered, not every throwaway one. -->
+<!-- The actual prompt text, verbatim, under each slot. Real prompt beats a tidy
+     description — paste what I actually typed. -->
 
+**Prompt 1 — Research preparation (Claude)**
+Purpose: prepare the research file — terms at my level, grouped search queries, candidate Reddit communities and X accounts (with confidence flags and exact verification steps), questions to take to real people, five real sources, which of my own claims need a source/test, and which parts of my problem are under-specified. Asked for candidates to verify in small batches, with the AI flagging its own uncertainty instead of guessing.
+```
+I'm working on a project and I'm on the step where I prepare a research file. I want your help preparing research, but I need you to be honest about confidence and never present uncertain things as fact.
+
+Context that's already locked, do not re-open these:
+
+- My problem: "The agent observes an inbound message from a sales lead. It must select answer, ask a qualifying question, hold, or escalate to a human because the lead's true intent and buying-readiness are not known."
+
+- My real level: I'm not a beginner on this. I run a live conversational sales agent in production, and I have a probability/options-trading background, so I'm comfortable with belief distributions, expected value, and cost asymmetry. Aim the technical terms and sources at that level, not at an intro level.
+
+- My framing: I treat this as a POMDP but solve it with a myopic (one-step) expected-cost policy over a belief, not full belief-state planning. Keep that distinction accurate in any terminology you give me.
+
+- My objective: design and test a cost-aware escalation policy where the agent holds a belief over the lead's hidden intent/readiness and picks the action with the lowest expected cost, then compare it against a baseline.
+
+- Public boundary: everything stays at the general problem level. No product name, no client details, no real prompts or data.
+
+Now help me with these, and for anything you can't verify, say so explicitly rather than guessing:
+
+1. The precise technical terms for this problem (decision theory, POMDP, escalation/deferral, calibration, cost-sensitive decisions, etc.), so I can search and write accurately.
+2. Useful search queries, grouped by what they'd turn up.
+3. 5 to 10 candidate Reddit communities. For EACH: why it's relevant, and your confidence that it's active and on-topic. Mark ones I must verify myself. I will remove any that are dead or irrelevant.
+4. Candidate researchers/engineers on X relevant to this (learning-to-defer, human-AI handoff, decision under uncertainty, applied LLM agents). Mark each with confidence and flag that I need to verify they're real and active.
+5. Questions I should be able to answer about hidden states, evidence, actions, and error costs, phrased so I can take them to real people.
+6. 5 genuinely useful and REAL papers/articles/repos/datasets, with enough detail that I can find and read them myself. Do not invent citations. If you're not confident a specific paper exists as described, say so and give me a search path instead.
+7. Which of my own claims/assumptions need a source or a test to back them.
+8. Which parts of my problem statement are still unclear or under-specified.
+
+Give me all of this as candidates for me to verify, not as finished answers.
+
+[plus formatting instructions: present each Reddit community, X account, and source as a verify-and-mark row with Item / Why relevant / Your confidence / What I should check / MY VERDICT; be interactive and give candidates in small batches, pausing after each; do not write my error log.]
+```
+
+**Prompt 2 — Paper understanding + usefulness + self-quiz (NotebookLM)**
+Purpose: understand each research paper in depth (including hard-to-read
+formulas), get a usefulness verdict, and be quizzed on it to test my own grasp
+before deciding if it fits my project.
+```
+I've uploaded the PDFs of my research papers. For each one:
+
+1. Give me a complete, detailed understanding of the paper — enough that it
+feels like I actually read the full paper, so I can form my own opinion.
+
+2. Explain every important formula that's hard to read: what each symbol means,
+what the equation is doing, and why it's built that way. Do not tie any of
+this to my project yet.
+
+3. Then, separately, give me a usefulness analysis: is this paper's findings
+useful or not useful, and why. Cover both the strengths and the limitations.
+
+4. Then quiz me on the paper as multiple-choice questions (no limit on how many),
+and based on my answers, give me an overall assesment.
+```
+
+**Prompt 3 — X post finder (Boardy, daily)**
+Purpose: find 3–4 recent real X posts I could genuinely reply to, with URL, who posted, a one-line summary, and one specific non-generic angle for me to reply from — with an instruction not to invent URLs and to give fewer if it couldn't find good ones.
+
+```
+You are helping me find X posts to comment on. My project: an AI agent that decides, on an inbound sales message, whether to answer, ask a qualifying question, hold, or escalate to a human — under hidden lead intent and readiness. I frame it as a POMDP solved with a myopic one-step expected-cost policy over an explicit belief, with asymmetric error costs (a missed escalation is far more expensive than a needless one). I care about: human-AI handoff, when agents should defer to a human, LLM confidence/calibration, cost-sensitive decisions, and applied LLM-agent building.
+
+Find me 3–4 recent X posts (last 7 days, ideally last 48h) that I could genuinely reply to — posts making a claim, sharing a build, or asking a question about any of: agent escalation / human handoff, confidence-based deferral, LLM calibration or overconfidence, when to trust an agent vs a human, or cost-aware agent decisions.
+
+For each: give the post URL, who posted it (name + why they're relevant), a one-line summary of what they're claiming or asking, and one specific, non-generic angle I could reply from based on my project. Prefer posts with some engagement (so a reply gets seen) but not so viral my reply drowns. Skip anything I can't add a substantive, specific comment to. Do not invent URLs — only real posts you can actually find; if you can't find 3–4 good ones today, give me fewer and say so.
+```
 ### Important AI errors
 
 <!-- Every case where an AI tool was confidently wrong. This section is
@@ -193,4 +262,11 @@ sales lead routing human vs automation cost
 
 | Tool | What it claimed | How I caught it | What was actually true |
 | --- | --- | --- | --- |
-|  |  |  |  |
+| NotebookLM | Its "grand synthesis" of the five papers recommended building my project as joint neural training of a classifier+rejector, Gumbel-Softmax, fairness regularization, model-free RL (DQN/PPO), and an RNN/LSTM hidden state as the belief. | I compared its recommendation against my locked design and saw it contradicted it directly. It had run with my exploratory MCQ answers (e.g. "direct neural policy", "model-free RL") and treated them as my project direction. | Those architectures are the opposite of my design. My project is an explicit two-part belief with a myopic one-step expected-cost policy. The papers are justification/framing for that design, not a to-do list of architectures to implement. |
+| NotebookLM | Presented its per-paper study guides with confident specifics, e.g. that the calibration paper contains a "complete proof that temperature scaling is the unique solution to the entropy maximization problem," and attributed a selective-classification bound to "Gascuel & Caraux." | Flagged as claims to verify against the actual papers before writing them down, rather than repeating them. | Still to be confirmed at source — reads like embellishment. Not recorded as fact until checked in the real paper; the "unique solution" phrasing and the bound attribution are not to be cited on NotebookLM's word. |
+| Claude | Suggested candidate X accounts for learning-to-defer / calibration / handoff, and implied there was a canonical "myopic VOI" paper I could cite. | I verified each account myself on X, and searched for the VOI paper. | Several accounts were dormant or off-topic (e.g. researcher last active 2022; another pivoted to a health startup; another had no content). There is no single canonical "myopic VOI" title — the concept traces to Howard's decision analysis and shows up under EVSI / active learning, so it's a search path, not one citation. Claude flagged low confidence on these itself and declined to guess exact handles. |
+| Claude | Drafted public-facing text (LinkedIn reply, Reddit thank-you replies) in a clean, tidy style. | Cohort feedback (Ayush) flagged that AI-written prose reads as AI in seconds; I also felt the drafts didn't sound like me. | The thinking was mine but the wording had AI-polish tells. Fix: draft public writing in my own voice and use AI to pressure-test, not to ghostwrite. Recorded as a process change, not a design change. |
+| NotebookLM | Claimed it had produced a comprehensive report giving "the depth of the complete 40+ page work" for the deferral paper. | I checked the output against the real paper length and pushed back — it was far thinner than the actual 40–48 page paper. | The report was a partial summary, not equivalent to the full paper. It also kept trying to jump to project-fit MCQs before delivering the depth I asked for. |
+<!-- 
+Full NotebookLM report/MCQ transcripts and full Claude session available on
+     request if the raw exchanges are needed for audit. -->
