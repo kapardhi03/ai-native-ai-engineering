@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 
 from .base import Provider, ProviderError
 from .json_utils import extract_json
-from .prompt import SYSTEM_PROMPT
+from .prompt import SYSTEM_PROMPT, render_observation
 
 if TYPE_CHECKING:
     from ..config import Settings
@@ -31,7 +31,7 @@ class GoogleProvider(Provider):
     def is_available(self, settings: "Settings") -> bool:
         return settings.has_key("google")
 
-    def generate_raw(self, message: str, settings: "Settings") -> dict:
+    def generate_raw(self, message: str, settings: "Settings", context=None) -> dict:
         try:
             from google import genai
             from google.genai import types
@@ -48,7 +48,7 @@ class GoogleProvider(Provider):
         client = genai.Client(api_key=settings.require_key("google"))
         response = client.models.generate_content(
             model=model,
-            contents=f"{SYSTEM_PROMPT}\n\nInbound message:\n{message}",
+            contents=f"{SYSTEM_PROMPT}\n\n{render_observation(message, context)}",
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 temperature=0,

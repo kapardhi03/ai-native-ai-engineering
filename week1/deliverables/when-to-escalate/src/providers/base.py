@@ -48,8 +48,15 @@ class Provider(ABC):
         Checked before calling, so a missing key is skipped rather than raised."""
 
     @abstractmethod
-    def generate_raw(self, message: str, settings: "Settings") -> dict:
-        """Return a raw {hot, warm, cold, needs_human} dict. Raise on failure."""
+    def generate_raw(self, message: str, settings: "Settings", context=None) -> dict:
+        """Return a raw {hot, warm, cold, needs_human} dict. Raise on failure.
+
+        `message` is always the lead's raw text. `context` is optional
+        conversation position. Providers that send text to a model render the two
+        together with `prompt.render_observation`; providers that inspect the text
+        directly must use `message` alone, or they end up scoring the context
+        prose rather than what the lead wrote.
+        """
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"<Provider {self.name} llm={self.is_llm}>"

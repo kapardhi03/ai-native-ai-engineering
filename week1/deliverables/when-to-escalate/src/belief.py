@@ -44,14 +44,56 @@ from typing import Optional
 try:  # package import
     from .config import Settings, load_settings
     from .providers import RULE_PROVIDER, get_provider, llm_chain
+    from .providers.prompt import render_observation
 except ImportError:  # run directly as a script
     from config import Settings, load_settings  # type: ignore
     from providers import RULE_PROVIDER, get_provider, llm_chain  # type: ignore
+    from providers.prompt import render_observation  # type: ignore
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 READINESS_LABELS = ("hot", "warm", "cold")
+
+
+@dataclass(frozen=True)
+class CaseContext:
+    """Where in a conversation a message arrived.
+
+    Added because roughly a third of the authored archetypes are not decidable
+    from text alone: the same words mean different things on turn 0 and turn 12,
+    and a template opener repeated many times is a blast rather than a lead.
+    This is the evidence for research-file question 8.
+
+    Deliberately minimal. Only what the archetypes actually needed — adding
+    fields the case set does not exercise would be untested surface.
+    """
+
+    turn_index: int = 0        # 0 = first inbound message of the conversation
+    repeat_count: int = 0      # times this same text was already seen from this lead
+
+    def describe_lines(self) -> list[tuple[str, str]]:
+        """Label/value pairs for the prompt. Omits fields at their default, so a
+        first message is not padded with noise the model has to ignore."""
+        lines: list[tuple[str, str]] = []
+        if self.turn_index == 0:
+            lines.append(("position", "first inbound message of the conversation"))
+        else:
+            lines.append(("position", f"turn {self.turn_index} of an ongoing conversation"))
+        if self.repeat_count:
+            lines.append(("repetition",
+                          f"this same text was already received {self.repeat_count} time(s)"))
+        return lines
+
+    def to_dict(self) -> dict:
+        return {"turn_index": self.turn_index, "repeat_count": self.repeat_count}
+
+    @classmethod
+    def from_dict(cls, d: Optional[dict]) -> Optional["CaseContext"]:
+        if not d:
+            return None
+        return cls(turn_index=int(d.get("turn_index", 0)),
+                   repeat_count=int(d.get("repeat_count", 0)))
 
 
 class BeliefSourceError(RuntimeError):
@@ -102,8 +144,9 @@ class BeliefMeta:
     provider: str            # registry name: "openai" | "google" | "rule"
     model: str
     generated_at: str        # ISO-8601, UTC
-    msg_hash: str
+    input_hash: str          # fingerprint of message AND context together
     from_cache: bool
+    context: Optional[dict] = None
 
     @property
     def is_llm(self) -> bool:
@@ -114,12 +157,15 @@ class BeliefMeta:
             return False     # unknown provider in an old cache: assume not LLM
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "provider": self.provider,
             "model": self.model,
             "generated_at": self.generated_at,
-            "msg_hash": self.msg_hash,
+            "input_hash": self.input_hash,
         }
+        if self.context is not None:
+            d["context"] = self.context
+        return d
 
 
 def to_belief(raw: dict) -> Belief:
@@ -147,14 +193,21 @@ def to_belief(raw: dict) -> Belief:
 # Provider policy. Which provider runs, and what happens when they all fail.
 # --------------------------------------------------------------------------- #
 
-def _generate_belief(message: str, settings: Settings) -> tuple[Belief, str]:
-    """Return (belief, provider_name), honouring the configured provider policy."""
+def _generate_belief(
+    message: str, settings: Settings, context: Optional[CaseContext] = None,
+) -> tuple[Belief, str]:
+    """Return (belief, provider_name), honouring the configured provider policy.
+
+    Message and context are passed through separately; each provider decides how
+    to combine them. Rendering here instead would force the keyword provider to
+    scan generated context prose.
+    """
     choice = settings.provider
 
     if choice != "auto":
         provider = get_provider(choice)
         logger.debug("Pinned provider: %s.", provider.name)
-        return to_belief(provider.generate_raw(message, settings)), provider.name
+        return to_belief(provider.generate_raw(message, settings, context)), provider.name
 
     failures: list[str] = []
     for provider in llm_chain():
@@ -162,7 +215,7 @@ def _generate_belief(message: str, settings: Settings) -> tuple[Belief, str]:
             failures.append(f"{provider.name}: no API key")
             continue
         try:
-            raw = provider.generate_raw(message, settings)
+            raw = provider.generate_raw(message, settings, context)
             return to_belief(raw), provider.name
         except Exception as exc:  # noqa: BLE001 - deliberate fall-through
             failures.append(f"{provider.name}: {type(exc).__name__}: {exc}")
@@ -181,16 +234,23 @@ def _generate_belief(message: str, settings: Settings) -> tuple[Belief, str]:
         "Provider failures:\n  - %s", "\n  - ".join(failures),
     )
     rule = get_provider(RULE_PROVIDER)
-    return to_belief(rule.generate_raw(message, settings)), rule.name
+    return to_belief(rule.generate_raw(message, settings, context)), rule.name
 
 
 # --------------------------------------------------------------------------- #
 # Cache
 # --------------------------------------------------------------------------- #
 
-def msg_hash(message: str) -> str:
-    """Short, stable fingerprint of the message text."""
-    return hashlib.sha256(message.encode("utf-8")).hexdigest()[:16]
+def input_hash(message: str, context: Optional[CaseContext] = None) -> str:
+    """Fingerprint of exactly what the provider was shown.
+
+    Hashes the rendered observation rather than the raw message, so a case whose
+    context changed is detected as changed. Hashing the message alone would let
+    context drift silently while the cache still reported a match.
+    """
+    return hashlib.sha256(
+        render_observation(message, context).encode("utf-8")
+    ).hexdigest()[:16]
 
 
 def _load_cache(path: Path) -> dict:
@@ -214,6 +274,7 @@ def get_belief(
     case_id: str,
     message: str,
     *,
+    context: Optional[CaseContext] = None,
     settings: Optional[Settings] = None,
     force_refresh: bool = False,
     refresh_on_message_change: bool = False,
@@ -224,10 +285,15 @@ def get_belief(
     which provider produced it and whether it came from the cache. Check
     `meta.is_llm` before making any calibration claim.
 
-    Cache is keyed by case_id (locked design 0d). The entry also stores the
-    message hash and audit fields, so drift is detectable after the fact.
+    `context` is optional conversation position. The belief is a pure function of
+    (message, context): both are rendered into one observation, and that
+    observation is what gets hashed, so the cache cannot report a match when the
+    context has changed underneath it.
 
-    If a cached case_id is present but the message text has changed, that is a
+    Cache is keyed by case_id (locked design 0d). The entry stores the input hash
+    and audit fields, so drift is detectable after the fact.
+
+    If a cached case_id is present but the input has changed, that is a
     stale-cache situation: warn loudly and, by default, still return the cached
     belief — reproducibility wins. Pass refresh_on_message_change=True to
     regenerate instead.
@@ -235,15 +301,15 @@ def get_belief(
     settings = settings or load_settings()
     cache = _load_cache(settings.cache_path)
     entry = cache.get(case_id)
-    incoming_hash = msg_hash(message)
+    incoming_hash = input_hash(message, context)
 
     if entry is not None and not force_refresh:
-        cached_hash = entry.get("msg_hash")
+        cached_hash = entry.get("input_hash")
         stale = cached_hash != incoming_hash
         if stale:
             logger.warning(
-                "Cache for case_id=%s was built from a DIFFERENT message "
-                "(cached hash %s != incoming %s).",
+                "Cache for case_id=%s was built from DIFFERENT input "
+                "(cached hash %s != incoming %s). Message or context changed.",
                 case_id, cached_hash, incoming_hash,
             )
         if not stale or not refresh_on_message_change:
@@ -255,20 +321,22 @@ def get_belief(
                     provider=entry.get("provider", "unknown"),
                     model=entry.get("model", "unknown"),
                     generated_at=entry.get("generated_at", "unknown"),
-                    msg_hash=cached_hash or "unknown",
+                    input_hash=cached_hash or "unknown",
                     from_cache=True,
+                    context=entry.get("context"),
                 ),
             )
 
     logger.info("Cache miss for case_id=%s; generating a belief.", case_id)
-    belief, provider_name = _generate_belief(message, settings)
+    belief, provider_name = _generate_belief(message, settings, context)
 
     meta = BeliefMeta(
         provider=provider_name,
         model=get_provider(provider_name).model_name(settings),
         generated_at=datetime.now(timezone.utc).isoformat(),
-        msg_hash=incoming_hash,
+        input_hash=incoming_hash,
         from_cache=False,
+        context=context.to_dict() if context is not None else None,
     )
 
     cache[case_id] = {"belief": belief.to_dict(), **meta.to_dict()}

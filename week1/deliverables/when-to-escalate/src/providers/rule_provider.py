@@ -47,7 +47,11 @@ class RuleProvider(Provider):
     def is_available(self, settings: "Settings") -> bool:
         return True  # no key, no network, never unavailable
 
-    def generate_raw(self, message: str, settings: "Settings") -> dict:
+    def generate_raw(self, message: str, settings: "Settings", context=None) -> dict:
+        # `context` is deliberately ignored. This provider matches substrings, so
+        # feeding it the rendered context block would score my own prose: the
+        # phrase "already received" contains "ready", which turned a no-signal
+        # opener into a hot lead. A crude floor must see only what the lead wrote.
         text = (message or "").lower()
         hot_hits = sum(kw in text for kw in HOT_KEYWORDS)
         cold_hits = sum(kw in text for kw in COLD_KEYWORDS)

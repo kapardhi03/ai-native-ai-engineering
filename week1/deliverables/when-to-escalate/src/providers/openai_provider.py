@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from .base import Provider, ProviderError
 from .json_utils import extract_json
-from .prompt import SYSTEM_PROMPT
+from .prompt import SYSTEM_PROMPT, render_observation
 
 if TYPE_CHECKING:
     from ..config import Settings
@@ -26,7 +26,7 @@ class OpenAIProvider(Provider):
     def is_available(self, settings: "Settings") -> bool:
         return settings.has_key("openai")
 
-    def generate_raw(self, message: str, settings: "Settings") -> dict:
+    def generate_raw(self, message: str, settings: "Settings", context=None) -> dict:
         # Imported here so the package works without the SDK installed.
         try:
             from openai import OpenAI
@@ -46,7 +46,7 @@ class OpenAIProvider(Provider):
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": message},
+                {"role": "user", "content": render_observation(message, context)},
             ],
             response_format={"type": "json_object"},
             temperature=0,  # belief is cached, but a deterministic call still helps

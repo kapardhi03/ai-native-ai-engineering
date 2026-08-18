@@ -36,7 +36,7 @@ def test_cache_file_is_created_with_the_documented_shape(belief, make_settings, 
     belief.get_belief("case-1", "price?", settings=s)
 
     entry = json.loads(s.cache_path.read_text())["case-1"]
-    assert set(entry) == {"belief", "provider", "model", "generated_at", "msg_hash"}
+    assert set(entry) == {"belief", "provider", "model", "generated_at", "input_hash"}
     assert entry["provider"] == "openai" and entry["model"] == "gpt-test"
     assert set(entry["belief"]["readiness"]) == {"hot", "warm", "cold"}
 
@@ -106,7 +106,7 @@ def test_changed_message_warns_but_keeps_the_cached_belief(belief, make_settings
 
     assert second == first and meta.from_cache is True
     assert rec.call_count == 1
-    assert "DIFFERENT message" in caplog.text
+    assert "DIFFERENT input" in caplog.text
 
 
 def test_refresh_on_message_change_regenerates(belief, make_settings, fake_openai):
@@ -150,15 +150,15 @@ def test_force_refresh_overwrites_the_stored_entry(belief, make_settings, fake_o
 # Message hashing
 # --------------------------------------------------------------------------- #
 
-def test_hash_is_stable_and_message_sensitive(belief):
-    assert belief.msg_hash("hello") == belief.msg_hash("hello")
-    assert belief.msg_hash("hello") != belief.msg_hash("hello ")
-    assert belief.msg_hash("Hello") != belief.msg_hash("hello")
+def test_hash_is_stable_and_input_sensitive(belief):
+    assert belief.input_hash("hello") == belief.input_hash("hello")
+    assert belief.input_hash("hello") != belief.input_hash("hello ")
+    assert belief.input_hash("Hello") != belief.input_hash("hello")
 
 
 @pytest.mark.parametrize("message", ["", "😀", "ünïcode", "a" * 50_000, "\n\t"])
 def test_hash_handles_awkward_input(belief, message):
-    assert len(belief.msg_hash(message)) == 16
+    assert len(belief.input_hash(message)) == 16
 
 
 # --------------------------------------------------------------------------- #
@@ -216,7 +216,7 @@ def test_entry_missing_optional_fields_still_reads(belief, make_settings):
     s.cache_path.write_text(json.dumps({
         "old": {"belief": {"readiness": {"hot": .5, "warm": .3, "cold": .2},
                            "needs_human": .1},
-                "msg_hash": belief.msg_hash("hi")}}))
+                "input_hash": belief.input_hash("hi")}}))
     b, meta = belief.get_belief("old", "hi", settings=s)
     assert b.readiness["hot"] == .5
     assert meta.provider == "unknown" and meta.is_llm is False

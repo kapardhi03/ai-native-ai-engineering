@@ -120,7 +120,7 @@ def test_belief_is_frozen(belief):
 
 def _meta(belief, provider):
     return belief.BeliefMeta(provider=provider, model="m", generated_at="t",
-                             msg_hash="h", from_cache=False)
+                             input_hash="h", from_cache=False)
 
 
 @pytest.mark.parametrize("provider,is_llm", [

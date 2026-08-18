@@ -56,7 +56,7 @@ def test_a_new_provider_needs_no_change_to_belief(providers, belief, make_settin
 
         def model_name(self, settings): return "constant-v1"
         def is_available(self, settings): return True
-        def generate_raw(self, message, settings):
+        def generate_raw(self, message, settings, context=None):
             return {"hot": 1.0, "warm": 0.0, "cold": 0.0, "needs_human": 0.5}
 
     providers.register(Constant())

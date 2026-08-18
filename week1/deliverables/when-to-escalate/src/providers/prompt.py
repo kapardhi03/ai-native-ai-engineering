@@ -28,5 +28,30 @@ You read ONE inbound message from a prospective customer and estimate two separa
    A hot lead can have LOW needs_human; a cold lead can have HIGH needs_human. These are
    separate judgments — do not tie one to the other.
 
+Some messages arrive with a CONVERSATION CONTEXT block. Use it — the same words mean
+different things at different points in a conversation. A one-word opener on turn 0 is a
+lead worth drawing out; the same text repeated many times is more likely a blast or a
+time-waster. A request that is routine early can warrant a human once a conversation is
+well underway.
+
 Return ONLY a JSON object with keys: hot, warm, cold, needs_human.
 hot + warm + cold should sum to about 1. All values in [0, 1]. No prose, no explanation."""
+
+
+def render_observation(message: str, context=None) -> str:
+    """Compose exactly what a provider sees: the message, plus context if present.
+
+    One shared renderer, for two reasons. Providers stay identical, so a wording
+    difference between them can never be mistaken for a model difference. And the
+    belief cache can hash this single string — which means the fingerprint covers
+    precisely what produced the belief, message and context together, rather than
+    the message alone while context silently varies.
+    """
+    text = message if message is not None else ""
+    if context is None:
+        return text
+
+    lines = [f"  {label}: {value}" for label, value in context.describe_lines()]
+    if not lines:
+        return text
+    return "CONVERSATION CONTEXT\n" + "\n".join(lines) + "\n\nINBOUND MESSAGE\n" + text
