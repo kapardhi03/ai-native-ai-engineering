@@ -54,6 +54,12 @@ given yet, the cell says so explicitly rather than being filled with a guess.
 | 12 | 2026-08-18 | `belief.py` rewired onto `config.py`: no module constants, no ambient env reads, keys passed explicitly into each provider | Approved | Closes Q5. Makes the Q3 cache-path fix actually take effect, and makes `config.py` the only place configuration resolves. | `src/belief.py` |
 | 13 | 2026-08-18 | Cache writes are atomic (temp file + `os.replace`) | Approved | *Reason not yet given — proposed by Claude.* The previous version truncated the real cache before writing, so a crash or interrupt mid-write destroyed every belief already collected — expensive, since each one costs an API call. | `src/belief.py` |
 | 14 | 2026-08-18 | `cache_provenance()` added: counts cache entries by provider | Approved | *Reason not yet given — proposed by Claude.* Makes Q6 checkable in one call before reporting calibration, rather than relying on remembering how a run went. | `src/belief.py` |
+| 15 | 2026-08-18 | The reported belief cache must be **LLM-only**; a mixed cache is not a valid basis for calibration | Approved | "It should be LLM Belief." Generate the reported cache with `BELIEF_ALLOW_RULE_FALLBACK=false`. Closes the intent behind Q6. | `src/belief.py`, `.env` |
+| 16 | 2026-08-18 | Providers extracted to `src/providers/`: one file per source, a registry, a shared prompt, and a shared JSON extractor | Approved | Closes Q7. Adding a provider is now a new file plus one `register()` call, with no edit to `belief.py`. `belief.py` keeps the belief, the provider *policy*, and the cache; it no longer knows how any provider works. | `src/providers/`, `src/belief.py` |
+| 17 | 2026-08-18 | `config.VALID_PROVIDERS` replaced by a lookup against the live registry | Approved | *Reason not yet given — proposed by Claude.* Found by a test: registering a provider did not make it selectable, because config validated against a hardcoded tuple. The registry was decorative until this was fixed. | `src/config.py` |
+| 18 | 2026-08-18 | `extract_json` rejects any JSON that is not an object | Approved | *Reason not yet given — proposed by Claude.* Found by a test: a model replying `null` or `[]` parsed cleanly, then every `.get()` missed and produced a confident uniform belief instead of a visible failure. | `src/providers/json_utils.py` |
+| 19 | 2026-08-18 | Full pytest suite added under `tests/`, with stubbed SDKs; no test may make a network call | Approved | "Build the test files. Include every edge case and consider all the cases." Stubs exercise the real provider code path, including the SDK import, so the tests cover production behaviour rather than a parallel implementation. | `tests/`, `pytest.ini` |
+| 20 | 2026-08-18 | `assert_llm_only()` added: raises unless every cached belief came from a real model | Approved | *Reason not yet given — proposed by Claude.* Turns decision 15 into a check that runs, rather than a rule someone has to remember before quoting an ECE figure. | `src/belief.py` |
 
 ---
 
@@ -66,11 +72,13 @@ Not decisions yet. Listed so they are not lost between steps.
 | Q1 | Should the rule-based fallback be deleted, or kept behind a flag? | **Closed** | Kept, gated by `BELIEF_ALLOW_RULE_FALLBACK`. See decision 6. |
 | Q2 | `.env` is inert — where does config loading live? | **Closed** | `src/config.py`, via `python-dotenv`. See decisions 7 and 10. |
 | Q3 | `DEFAULT_CACHE_PATH` is relative to the working directory. | **Closed** | Read from `.env`, resolved against the repo root. See decision 8. |
-| Q4 | Reasons for rows `0c`, `0e`, `3`, `10`, `13` and `14` are still blank. | Open | Fill in above. |
+| Q4 | Reasons for rows `0c`, `0e`, `3`, `10`, `13`, `14`, `17`, `18` and `20` are still blank. | Open | Fill in above. |
 | Q5 | `belief.py` does not yet use `config.py`. | **Closed** | Rewired. See decision 12. |
 | Q6 | Is the belief calibrated enough to threshold on (research-file Q1)? Cannot be answered while any cached belief may be keyword-derived — ECE over a mixed cache is not LLM calibration. | Open | Now checkable via `cache_provenance()`. Needs a real strict run, which must happen on KK's machine — the build container has no keys. |
-| Q7 | Providers still live inside `belief.py`. Adding one means editing the belief module. Extract to `src/providers/`? | Open | Proposed as the next sub-step. |
-| Q8 | No test file exists. The checks run so far were throwaway scripts, so nothing re-runs them on a later change. | Open | Undecided. |
+| Q7 | Providers still live inside `belief.py`. | **Closed** | Extracted to `src/providers/`. See decision 16. |
+| Q8 | No test file exists. | **Closed** | 208 tests under `tests/`. See decision 19. |
+| Q9 | `BELIEF_ALLOW_RULE_FALLBACK` still defaults to **true**, so an unconfigured run can produce a mixed cache. Should strict be the default, given decision 15? | Open | Proposed, not yet decided. |
+| Q10 | No synthetic case set exists yet in `data/`, so nothing has been run against a real LLM. Decision 15 is enforced but never exercised against a live API. | Open | Needs a run on KK's machine. |
 
 ---
 

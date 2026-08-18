@@ -41,9 +41,18 @@ logger.addHandler(logging.NullHandler())
 # Defaults. Every one of these is overridable from .env.
 # --------------------------------------------------------------------------- #
 
-VALID_PROVIDERS = ("auto", "openai", "google", "rule")
+#: "auto" means "try the LLM chain in order". Every other valid value is a
+#: provider registry name, looked up at validation time rather than hardcoded --
+#: otherwise registering a provider would not actually make it selectable.
+AUTO_PROVIDER = "auto"
 
-DEFAULT_PROVIDER = "auto"
+
+def valid_providers() -> tuple[str, ...]:
+    """Selectable BELIEF_PROVIDER values: "auto" plus every registered provider."""
+    from providers import available_providers  # local: avoids an import cycle
+    return (AUTO_PROVIDER, *available_providers())
+
+DEFAULT_PROVIDER = AUTO_PROVIDER
 DEFAULT_ALLOW_RULE_FALLBACK = True
 DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
 DEFAULT_GOOGLE_MODEL = "gemini-2.0-flash"
@@ -247,10 +256,11 @@ class Settings:
 # --------------------------------------------------------------------------- #
 
 def _validate(settings: Settings) -> Settings:
-    if settings.provider not in VALID_PROVIDERS:
+    allowed = valid_providers()
+    if settings.provider not in allowed:
         raise ConfigError(
             f"BELIEF_PROVIDER={settings.provider!r} is not recognised. "
-            f"Valid values: {', '.join(VALID_PROVIDERS)}."
+            f"Valid values: {', '.join(allowed)}."
         )
 
     if settings.provider == "rule" and not settings.allow_rule_fallback:
@@ -264,7 +274,7 @@ def _validate(settings: Settings) -> Settings:
 
     # The failure mode worth catching early: a strict run with no way to satisfy
     # it. Left to fail at call time it would burn the whole run first.
-    if (settings.provider == "auto"
+    if (settings.provider == AUTO_PROVIDER
             and not settings.allow_rule_fallback
             and not settings.live_providers):
         raise ConfigError(

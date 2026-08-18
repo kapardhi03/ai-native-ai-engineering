@@ -1,5 +1,10 @@
+# Configuration
 python-dotenv>=1.0.0
 
-# Belief providers. Optional: the rule-based fallback runs without either.
+# Belief providers. Both optional: the rule-based fallback needs neither, but a
+# real run does (BELIEF_ALLOW_RULE_FALLBACK=false requires at least one).
 openai>=1.0.0
 google-genai>=1.0.0
+
+# Tests
+pytest>=8.0.0
