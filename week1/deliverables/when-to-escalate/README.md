@@ -1,4 +1,4 @@
-# When to Escalate - Student Project
+# When to Escalate - Project
 
 This folder holds a full week's project: the research file, the record of public
 discussions, the agent and probability-model decision records, the synthetic test
