@@ -1,0 +1,1833 @@
+{
+  "schema_version": 1,
+  "seed": 20260818,
+  "n_cases": 100,
+  "split_method": "stratified by archetype and sub-variant, seeded",
+  "readiness_states": [
+    "hot",
+    "warm",
+    "cold"
+  ],
+  "constraint_semantics": {
+    "no_direct_answer": "Removes the 'answer' action from the feasible set entirely. Not a priced cell — no belief, however confident, can select it."
+  },
+  "note": "Synthetic. No product name, client data, or real message content. Non-leads (competitor, abuse, blast) are labelled cold as a known approximation — see build-log decision 27.",
+  "cases": [
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Hi, can I get more info",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "test",
+      "case_id": "a01-first-001"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Hello, need details please",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "dev",
+      "case_id": "a01-first-002"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Interested. Send details",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "test",
+      "case_id": "a01-first-003"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Pls share more information",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "test",
+      "case_id": "a01-first-004"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Hi. Details?",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "dev",
+      "case_id": "a01-first-005"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1a-first",
+      "message": "Can I know more about this",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "low signal, first contact — answer and draw out",
+      "split": "dev",
+      "case_id": "a01-first-006"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1b-blast",
+      "message": "Hi, can I get more info",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 3
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "identical text repeated — likely blast, hold/junk",
+      "split": "dev",
+      "case_id": "a01-blast-007"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1b-blast",
+      "message": "Interested. Send details",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 5
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "identical text repeated — likely blast, hold/junk",
+      "split": "dev",
+      "case_id": "a01-blast-008"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1b-blast",
+      "message": "Pls share more information",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 4
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "identical text repeated — likely blast, hold/junk",
+      "split": "test",
+      "case_id": "a01-blast-009"
+    },
+    {
+      "archetype": 1,
+      "archetype_name": "template opener",
+      "variant": "1b-blast",
+      "message": "Hello, need details please",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 6
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "identical text repeated — likely blast, hold/junk",
+      "split": "test",
+      "case_id": "a01-blast-010"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2a-early",
+      "message": "Can you send some photos?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "routine early request — send and wait",
+      "split": "dev",
+      "case_id": "a02-early-011"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2a-early",
+      "message": "Pics available?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "routine early request — send and wait",
+      "split": "dev",
+      "case_id": "a02-early-012"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2a-early",
+      "message": "Send photos of the property",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "routine early request — send and wait",
+      "split": "test",
+      "case_id": "a02-early-013"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2a-early",
+      "message": "Do you have images to share",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "routine early request — send and wait",
+      "split": "test",
+      "case_id": "a02-early-014"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2b-deep",
+      "message": "Send photos, I want to see the actual site not the brochure ones",
+      "context": {
+        "turn_index": 9,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "proof demand late in convo — send + notify a human",
+      "split": "test",
+      "case_id": "a02-deep-015"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2b-deep",
+      "message": "The pictures look edited. Send real photos taken today",
+      "context": {
+        "turn_index": 12,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "proof demand late in convo — send + notify a human",
+      "split": "dev",
+      "case_id": "a02-deep-016"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2b-deep",
+      "message": "Can you send photos of the current construction status with date",
+      "context": {
+        "turn_index": 11,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "proof demand late in convo — send + notify a human",
+      "split": "test",
+      "case_id": "a02-deep-017"
+    },
+    {
+      "archetype": 2,
+      "archetype_name": "send photos",
+      "variant": "2b-deep",
+      "message": "I need actual site photos before I discuss with my wife",
+      "context": {
+        "turn_index": 14,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "proof demand late in convo — send + notify a human",
+      "split": "dev",
+      "case_id": "a02-deep-018"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3a-first",
+      "message": "Hi",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "almost no signal — ask, draw them out",
+      "split": "test",
+      "case_id": "a03-first-019"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3a-first",
+      "message": "Hello",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "almost no signal — ask, draw them out",
+      "split": "dev",
+      "case_id": "a03-first-020"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3a-first",
+      "message": "Hii",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "almost no signal — ask, draw them out",
+      "split": "test",
+      "case_id": "a03-first-021"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3a-first",
+      "message": "Hey",
+      "context": {
+        "turn_index": 0,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "almost no signal — ask, draw them out",
+      "split": "dev",
+      "case_id": "a03-first-022"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3b-followup",
+      "message": "Hi",
+      "context": {
+        "turn_index": 7,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "re-ping mid-convo — genuine lead, notify",
+      "split": "test",
+      "case_id": "a03-followup-023"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3b-followup",
+      "message": "Hello?",
+      "context": {
+        "turn_index": 9,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "re-ping mid-convo — genuine lead, notify",
+      "split": "dev",
+      "case_id": "a03-followup-024"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3b-followup",
+      "message": "Hi again",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "re-ping mid-convo — genuine lead, notify",
+      "split": "dev",
+      "case_id": "a03-followup-025"
+    },
+    {
+      "archetype": 3,
+      "archetype_name": "one-word ping",
+      "variant": "3b-followup",
+      "message": "?",
+      "context": {
+        "turn_index": 11,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "re-ping mid-convo — genuine lead, notify",
+      "split": "test",
+      "case_id": "a03-followup-026"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "What's the price for the 3BHK?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "dev",
+      "case_id": "a04-answerable-027"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "Is the 2BHK still available?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "test",
+      "case_id": "a04-answerable-028"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "What is the total built-up area?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "test",
+      "case_id": "a04-answerable-029"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "Price range for east facing?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "test",
+      "case_id": "a04-answerable-030"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "How much is the per sq ft rate?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "test",
+      "case_id": "a04-answerable-031"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "Is EMI option available?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "dev",
+      "case_id": "a04-answerable-032"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "What's the possession date?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "dev",
+      "case_id": "a04-answerable-033"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4a-answerable",
+      "message": "Are there any 4BHK units left?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "hot intent, answerable without a human",
+      "split": "dev",
+      "case_id": "a04-answerable-034"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Can we book a site visit this Sunday?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "test",
+      "case_id": "a04-booking-035"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Site visit available tomorrow morning?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "dev",
+      "case_id": "a04-booking-036"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "I want to block a unit today, what's the process?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "dev",
+      "case_id": "a04-booking-037"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Free booking this weekend? I can come with my family",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "test",
+      "case_id": "a04-booking-038"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Ready to pay the token amount, who do I speak to?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "dev",
+      "case_id": "a04-booking-039"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Can someone call me today, I want to finalize",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "test",
+      "case_id": "a04-booking-040"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "I'm in town only till Friday, can we meet at the site?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "test",
+      "case_id": "a04-booking-041"
+    },
+    {
+      "archetype": 4,
+      "archetype_name": "ready buyer",
+      "variant": "4b-booking",
+      "message": "Please arrange a visit, I want to close this week",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "hot AND needs a human to actually book",
+      "split": "dev",
+      "case_id": "a04-booking-042"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Can you send me the land papers?",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — never send legal docs",
+      "split": "test",
+      "case_id": "a05-restricted-043"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Share the title deed, I'll get it verified before paying",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — never send legal docs",
+      "split": "test",
+      "case_id": "a05-restricted-044"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "I need the sale agreement draft before I transfer the token",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — never send legal docs",
+      "split": "dev",
+      "case_id": "a05-restricted-045"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Send the EC and the mother deed today, my lawyer is waiting",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — never send legal docs",
+      "split": "test",
+      "case_id": "a05-restricted-046"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Can you guarantee the title is clear?",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — no written guarantee",
+      "split": "dev",
+      "case_id": "a05-restricted-047"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Is there any litigation on this land? Give it in writing",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — no written guarantee",
+      "split": "dev",
+      "case_id": "a05-restricted-048"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "Send the legal documents for my advocate to check",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — no written guarantee",
+      "split": "test",
+      "case_id": "a05-restricted-049"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5a-restricted",
+      "message": "What guarantee do I have that the papers are genuine?",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [
+        "no_direct_answer"
+      ],
+      "notes": "HARD CONSTRAINT — no written guarantee",
+      "split": "dev",
+      "case_id": "a05-restricted-050"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5b-public",
+      "message": "Is this HMDA approved?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "legal-SOUNDING but public info — must NOT over-escalate",
+      "split": "dev",
+      "case_id": "a05-public-051"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5b-public",
+      "message": "Can you share the HMDA approval number?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "legal-SOUNDING but public info — must NOT over-escalate",
+      "split": "test",
+      "case_id": "a05-public-052"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5b-public",
+      "message": "Is the layout LP number available publicly?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "legal-SOUNDING but public info — must NOT over-escalate",
+      "split": "dev",
+      "case_id": "a05-public-053"
+    },
+    {
+      "archetype": 5,
+      "archetype_name": "legal / land papers",
+      "variant": "5b-public",
+      "message": "Is it RERA registered? What's the registration number",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "legal-SOUNDING but public info — must NOT over-escalate",
+      "split": "test",
+      "case_id": "a05-public-054"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "Are you a bot? You keep sending the same reply",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "test",
+      "case_id": "a06-frustrated-055"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "Why do you keep switching language, is this automated?",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "dev",
+      "case_id": "a06-frustrated-056"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "I asked the same thing three times and got the same template. Is anyone there?",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "dev",
+      "case_id": "a06-frustrated-057"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "This is clearly AI. Put a real person on",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "dev",
+      "case_id": "a06-frustrated-058"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "Stop the robot replies",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "test",
+      "case_id": "a06-frustrated-059"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6a-frustrated",
+      "message": "I don't want to talk to a machine",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "trust broken — stop and escalate-pause",
+      "split": "test",
+      "case_id": "a06-frustrated-060"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6b-mild",
+      "message": "Are you a bot? 😄",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "light curiosity — answerable, must not over-escalate",
+      "split": "test",
+      "case_id": "a06-mild-061"
+    },
+    {
+      "archetype": 6,
+      "archetype_name": "suspects a bot",
+      "variant": "6b-mild",
+      "message": "Is this a real person or auto reply?",
+      "context": {
+        "turn_index": 2,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "light curiosity — answerable, must not over-escalate",
+      "split": "dev",
+      "case_id": "a06-mild-062"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7a-price-only",
+      "message": "What's your current rate per sq ft? I'm tracking prices in this area",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "answer listed price only",
+      "split": "dev",
+      "case_id": "a07-price-063"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7a-price-only",
+      "message": "Is the price negotiable? Asking for comparison",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "answer listed price only",
+      "split": "test",
+      "case_id": "a07-price-064"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7a-price-only",
+      "message": "What are you quoting now versus last quarter?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "answer listed price only",
+      "split": "dev",
+      "case_id": "a07-price-065"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7a-price-only",
+      "message": "Do you match competitor pricing in the same layout?",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "answer listed price only",
+      "split": "test",
+      "case_id": "a07-price-066"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7b-internals",
+      "message": "What commission does your team get on each sale?",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "fishing for internal margins — escalate",
+      "split": "dev",
+      "case_id": "a07-internals-067"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7b-internals",
+      "message": "What's your actual margin on this? I know the builder rate",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "fishing for internal margins — escalate",
+      "split": "test",
+      "case_id": "a07-internals-068"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7b-internals",
+      "message": "How much discount can you give internally, off the record?",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "fishing for internal margins — escalate",
+      "split": "dev",
+      "case_id": "a07-internals-069"
+    },
+    {
+      "archetype": 7,
+      "archetype_name": "competitor fishing",
+      "variant": "7b-internals",
+      "message": "Who's your channel partner and what cut do they take?",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "fishing for internal margins — escalate",
+      "split": "test",
+      "case_id": "a07-internals-070"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8a-voice",
+      "message": "[voice note · 0:18 · not transcribed]",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "no text to read — transcribe, then continue",
+      "split": "test",
+      "case_id": "a08-voice-071"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8a-voice",
+      "message": "[voice note · 0:42 · not transcribed]",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "no text to read — transcribe, then continue",
+      "split": "test",
+      "case_id": "a08-voice-072"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8a-voice",
+      "message": "[voice note · 0:07 · not transcribed]",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "no text to read — transcribe, then continue",
+      "split": "dev",
+      "case_id": "a08-voice-073"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8a-voice",
+      "message": "[voice note · 1:23 · not transcribed]",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "no text to read — transcribe, then continue",
+      "split": "dev",
+      "case_id": "a08-voice-074"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8b-reaction",
+      "message": "👍",
+      "context": {
+        "turn_index": 4,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "bare reaction — stay quiet, hold",
+      "split": "test",
+      "case_id": "a08-reaction-075"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8b-reaction",
+      "message": "🙏",
+      "context": {
+        "turn_index": 4,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "bare reaction — stay quiet, hold",
+      "split": "test",
+      "case_id": "a08-reaction-076"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8b-reaction",
+      "message": "[sticker]",
+      "context": {
+        "turn_index": 4,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "bare reaction — stay quiet, hold",
+      "split": "dev",
+      "case_id": "a08-reaction-077"
+    },
+    {
+      "archetype": 8,
+      "archetype_name": "media, no text",
+      "variant": "8b-reaction",
+      "message": "😊😊",
+      "context": {
+        "turn_index": 4,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "bare reaction — stay quiet, hold",
+      "split": "dev",
+      "case_id": "a08-reaction-078"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "Hi so we are looking to shift by December because my daughter's school admission is in Miyapur and my husband's office moved to Gachibowli, budget is around 85 to 95 lakhs but we can stretch a little if the layout is good, we already sold our old flat so funds are ready, we need 3BHK east facing preferably with two parking, also my mother in law stays with us so ground floor or good lift is a must",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "dev",
+      "case_id": "a09-oversharer-079"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "We have been looking since March, saw about 11 properties, most are overpriced. My brother in law bought in the same area two years back at much lower rate. We are ready to move fast if the price is right, loan is pre-approved from SBI for 70 lakhs, rest we will arrange. Need to finish before Diwali because of muhurat",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "dev",
+      "case_id": "a09-oversharer-080"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "Actually my father is retiring next year and wants to invest the retirement corpus in land rather than FD, so we are exploring. He is in Vizag, I am in Hyderabad, so I am doing the running around. Not urgent but if something good comes we will take it. He is very particular about clear title and approvals",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "hot",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "dev",
+      "case_id": "a09-oversharer-081"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "So basically we are a family of five, currently in a rented 2BHK near Kukatpally, rent is 28k which feels like waste. Thinking of buying but also confused whether to wait for prices to come down. My friends say buy now, my uncle says wait. What do you think honestly",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "test",
+      "case_id": "a09-oversharer-082"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "I saw your listing while scrolling, we are not in a hurry but planning for next year maybe. Currently my job is in Bangalore but there is a chance of transfer to Hyderabad in the next cycle. If that happens we will buy immediately. Otherwise we may just invest and rent it out. Depends on many things really",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "test",
+      "case_id": "a09-oversharer-083"
+    },
+    {
+      "archetype": 9,
+      "archetype_name": "over-sharer",
+      "variant": "9-oversharer",
+      "message": "Long story but our previous booking with another builder got stuck, they delayed possession by three years and we finally took the refund last month. So now we are very careful. Money is in hand, around 60 lakhs, but we want ready to move or near completion only, no more under construction risk for us",
+      "context": {
+        "turn_index": 1,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "long input, bounded reply — no human needed",
+      "split": "test",
+      "case_id": "a09-oversharer-084"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "What's the price?",
+      "context": {
+        "turn_index": 3,
+        "repeat_count": 1
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "test",
+      "case_id": "a10-early-085"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "Price?",
+      "context": {
+        "turn_index": 5,
+        "repeat_count": 2
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "test",
+      "case_id": "a10-early-086"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "Can you give some discount?",
+      "context": {
+        "turn_index": 4,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "dev",
+      "case_id": "a10-early-087"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "What's the best price you can do?",
+      "context": {
+        "turn_index": 6,
+        "repeat_count": 1
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "dev",
+      "case_id": "a10-early-088"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "Price for 2BHK again?",
+      "context": {
+        "turn_index": 7,
+        "repeat_count": 2
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "test",
+      "case_id": "a10-early-089"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10a-early",
+      "message": "Any offer going on?",
+      "context": {
+        "turn_index": 5,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "warm",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "repetitive but still plausible — restricted answer",
+      "split": "dev",
+      "case_id": "a10-early-090"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10b-persistent",
+      "message": "I can't come for a visit but give me the discount price",
+      "context": {
+        "turn_index": 14,
+        "repeat_count": 3
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "never commits — hand off, escalate-notify",
+      "split": "test",
+      "case_id": "a10-persistent-091"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10b-persistent",
+      "message": "Just tell me the final price, I've asked so many times",
+      "context": {
+        "turn_index": 18,
+        "repeat_count": 8
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "never commits — hand off, escalate-notify",
+      "split": "test",
+      "case_id": "a10-persistent-092"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10b-persistent",
+      "message": "Who is the girl in the ad?",
+      "context": {
+        "turn_index": 12,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "never commits — hand off, escalate-notify",
+      "split": "dev",
+      "case_id": "a10-persistent-093"
+    },
+    {
+      "archetype": 10,
+      "archetype_name": "polite time-waster",
+      "variant": "10b-persistent",
+      "message": "Give me the lowest price, I'm not visiting any site",
+      "context": {
+        "turn_index": 16,
+        "repeat_count": 5
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "never commits — hand off, escalate-notify",
+      "split": "dev",
+      "case_id": "a10-persistent-094"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11a-first",
+      "message": "You sound cute, are you single?",
+      "context": {
+        "turn_index": 5,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "first instance — hold, do not engage",
+      "split": "dev",
+      "case_id": "a11-first-095"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11a-first",
+      "message": "Send your photo instead of the property",
+      "context": {
+        "turn_index": 5,
+        "repeat_count": 0
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": false
+      },
+      "constraints": [],
+      "notes": "first instance — hold, do not engage",
+      "split": "test",
+      "case_id": "a11-first-096"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11b-repeated",
+      "message": "You sound cute, are you single?",
+      "context": {
+        "turn_index": 9,
+        "repeat_count": 3
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "repeated — stop responding, escalate-pause",
+      "split": "dev",
+      "case_id": "a11-repeated-097"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11b-repeated",
+      "message": "Send your photo instead of the property",
+      "context": {
+        "turn_index": 11,
+        "repeat_count": 4
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "repeated — stop responding, escalate-pause",
+      "split": "test",
+      "case_id": "a11-repeated-098"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11b-repeated",
+      "message": "Forget the flat, let's meet for coffee",
+      "context": {
+        "turn_index": 13,
+        "repeat_count": 2
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "repeated — stop responding, escalate-pause",
+      "split": "dev",
+      "case_id": "a11-repeated-099"
+    },
+    {
+      "archetype": 11,
+      "archetype_name": "vulgar / off-topic",
+      "variant": "11b-repeated",
+      "message": "Why so serious, chat with me properly na",
+      "context": {
+        "turn_index": 15,
+        "repeat_count": 5
+      },
+      "labels": {
+        "readiness": "cold",
+        "needs_human": true
+      },
+      "constraints": [],
+      "notes": "repeated — stop responding, escalate-pause",
+      "split": "test",
+      "case_id": "a11-repeated-100"
+    }
+  ]
+}

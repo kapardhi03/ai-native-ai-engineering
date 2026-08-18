@@ -1,12 +1,17 @@
 """
 belief.py — inbound message -> belief, with a reproducible cache.
 
-Belief shape (locked design):
+Belief shape (locked design 0a):
   - readiness: a probability distribution over {hot, warm, cold} that sums to 1
   - needs_human: a single probability in [0, 1], INDEPENDENT of readiness
 
 These are two separate judgments, not one score. A hot lead can have low
 needs_human; a cold lead can have high needs_human.
+
+`Belief` is deliberately the pure mathematical object — the same thing the paper
+calls a belief, and nothing else. Where a number came from lives in a separate
+`BeliefMeta`, so bookkeeping never contaminates the object the policy reasons
+over. `get_belief()` returns the pair.
 
 Belief source is a real LLM call, which is non-deterministic. To keep the
 experiment reproducible, every case is run through the LLM exactly once and the
@@ -14,12 +19,15 @@ result is written to a JSON cache keyed by case_id. Policies read beliefs from
 the cache and never call the LLM themselves, so both policies see identical
 beliefs.
 
-Provider order: OpenAI (1st) -> Google (2nd) -> rule-based fallback (always works,
-so the pipeline runs offline / with no API key).
+This module owns the belief, the provider *policy*, and the cache. It does not
+own the providers themselves — those live in `providers/`, so adding one does
+not mean editing this file. Nor does it own configuration; that is `config.py`.
 
-Public boundary: the prompt below is a generic, synthetic lead-qualification
-prompt written for this experiment. It is NOT the production prompt, and it
-carries no product name, client data, or real message content.
+The keyword fallback exists so the pipeline runs with no API key, but it is not
+allowed to be invisible. When `allow_rule_fallback` is false, exhausting the real
+providers raises `BeliefSourceError` and writes nothing, rather than quietly
+producing keyword numbers that are indistinguishable from LLM numbers once
+cached. Every cache entry records its provider either way.
 """
 
 from __future__ import annotations
@@ -28,56 +36,116 @@ import hashlib
 import json
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
+
+try:  # package import
+    from .config import Settings, load_settings
+    from .providers import RULE_PROVIDER, get_provider, llm_chain
+    from .providers.prompt import render_observation
+except ImportError:  # run directly as a script
+    from config import Settings, load_settings  # type: ignore
+    from providers import RULE_PROVIDER, get_provider, llm_chain  # type: ignore
+    from providers.prompt import render_observation  # type: ignore
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-# --------------------------------------------------------------------------- #
-# Config
-# --------------------------------------------------------------------------- #
-
 READINESS_LABELS = ("hot", "warm", "cold")
 
-DEFAULT_CACHE_PATH = "data/belief_cache.json"
 
+@dataclass(frozen=True)
+class CaseContext:
+    """Where in a conversation a message arrived.
 
-DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
-DEFAULT_GOOGLE_MODEL = "gemini-2.0-flash"
+    Added because roughly a third of the authored archetypes are not decidable
+    from text alone: the same words mean different things on turn 0 and turn 12,
+    and a template opener repeated many times is a blast rather than a lead.
+    This is the evidence for research-file question 8.
 
-SYSTEM_PROMPT = """You are a lead-qualification analyst for an inbound sales channel.
-You read ONE inbound message from a prospective customer and estimate two separate things.
+    Deliberately minimal. Only what the archetypes actually needed — adding
+    fields the case set does not exercise would be untested surface.
+    """
 
-1) readiness — the prospect's buying readiness as a probability distribution over three
-   states that sums to 1:
-     - hot:  strong, concrete intent to move forward soon (asks price/availability to buy,
-             wants to schedule or visit, ready to commit, urgency)
-     - warm: genuine interest but still exploring (comparing options, general questions,
-             no concrete next step yet)
-     - cold: low or unclear intent (vague, browsing, early curiosity, or off-topic)
+    turn_index: int = 0        # 0 = first inbound message of the conversation
+    repeat_count: int = 0      # times this same text was already seen from this lead
 
-2) needs_human — a single probability in [0, 1], INDEPENDENT of readiness, that this
-   message should be handled by a human rather than an automated agent. Raise it for:
-   legal or contractual questions, complaints or dissatisfaction, negotiation, sensitive
-   or emotional content, or anything where a wrong automated answer could cause real harm.
-   A hot lead can have LOW needs_human; a cold lead can have HIGH needs_human. These are
-   separate judgments — do not tie one to the other.
+    def describe_lines(self) -> list[tuple[str, str]]:
+        """Label/value pairs for the prompt. Omits fields at their default, so a
+        first message is not padded with noise the model has to ignore."""
+        lines: list[tuple[str, str]] = []
+        if self.turn_index == 0:
+            lines.append(("position", "first inbound message of the conversation"))
+        else:
+            lines.append(("position", f"turn {self.turn_index} of an ongoing conversation"))
+        if self.repeat_count:
+            lines.append(("repetition",
+                          f"this same text was already received {self.repeat_count} time(s)"))
+        return lines
 
-Return ONLY a JSON object with keys: hot, warm, cold, needs_human.
-hot + warm + cold should sum to about 1. All values in [0, 1]. No prose, no explanation."""
+    def to_dict(self) -> dict:
+        return {"turn_index": self.turn_index, "repeat_count": self.repeat_count}
+
+    @classmethod
+    def from_dict(cls, d: Optional[dict]) -> Optional["CaseContext"]:
+        if not d:
+            return None
+        return cls(turn_index=int(d.get("turn_index", 0)),
+                   repeat_count=int(d.get("repeat_count", 0)))
 
 
 # --------------------------------------------------------------------------- #
-# Belief type
+# FAILURE ANALYSIS — context-token leakage into a keyword belief
+#
+# Kept as a worked example for the paper, not just a fixed bug.
+#
+# When conversation context was first added, the rendered context block was
+# passed to every provider, including the keyword fallback. That provider scores
+# by substring match. The rendered phrase
+#
+#     "this same text was already received 4 time(s)"
+#
+# contains "ready" — a hot-readiness keyword. So a template opener carrying no
+# buying signal at all ("Hi, can I get more info") scored hot = 0.545 instead of
+# 0.286, purely because the harness told the model the message had been repeated.
+#
+# Three properties make it a good failure example:
+#   - Direction. The leak pushed cold leads toward hot, the expensive direction:
+#     it suppresses escalation on exactly the junk/blast cases that should be
+#     held, because they are the cases context is attached to.
+#   - Silence. The belief stayed a valid distribution summing to 1, was cached
+#     with a normal-looking provenance record, and nothing downstream could tell.
+#   - Correlation. It fires only where context is present — archetypes 1, 3 and
+#     11 — so it biases one subgroup and would distort a per-archetype error
+#     breakdown rather than showing up as uniform noise.
+#
+# Fix: providers receive `message` and `context` separately. Only providers that
+# send text to a model render the two together; anything that inspects the text
+# directly sees the lead's words alone. See providers/base.generate_raw and
+# tests/test_context.py::test_context_does_not_change_the_keyword_belief.
 # --------------------------------------------------------------------------- #
 
-@dataclass
+
+class BeliefSourceError(RuntimeError):
+    """No permitted provider could produce a belief.
+
+    Raised instead of silently degrading to keyword scoring when the run has
+    declared that beliefs must come from a real LLM call.
+    """
+
+
+# --------------------------------------------------------------------------- #
+# The belief itself — pure. No provenance, no bookkeeping.
+# --------------------------------------------------------------------------- #
+
+@dataclass(frozen=True)
 class Belief:
-    """A validated belief. readiness always sums to 1; needs_human in [0, 1]."""
-    readiness: dict          # {"hot": p, "warm": p, "cold": p}, sums to 1
-    needs_human: float       # in [0, 1]
+    """readiness always sums to 1; needs_human in [0, 1], independent of it."""
+
+    readiness: dict          # {"hot": p, "warm": p, "cold": p}
+    needs_human: float
 
     def to_dict(self) -> dict:
         return {
@@ -92,230 +160,262 @@ class Belief:
             needs_human=float(d["needs_human"]),
         )
 
+    def most_likely(self) -> str:
+        """Highest-probability readiness state. Ties break in READINESS_LABELS order."""
+        return max(READINESS_LABELS, key=lambda k: self.readiness[k])
 
-def _to_belief(raw: dict) -> Belief:
-    """Turn a raw {hot,warm,cold,needs_human} dict into a validated Belief.
 
-    Robust to LLM sloppiness: clamps negatives, normalizes the distribution,
-    clamps needs_human. If the readiness mass is zero, falls back to uniform.
+# --------------------------------------------------------------------------- #
+# Provenance — separate, so Belief stays the paper's object exactly.
+# --------------------------------------------------------------------------- #
+
+@dataclass(frozen=True)
+class BeliefMeta:
+    """Where a belief came from. Never enters the decision arithmetic."""
+
+    provider: str            # registry name: "openai" | "google" | "rule"
+    model: str
+    generated_at: str        # ISO-8601, UTC
+    input_hash: str          # fingerprint of message AND context together
+    from_cache: bool
+    context: Optional[dict] = None
+
+    @property
+    def is_llm(self) -> bool:
+        """False means keyword-scored. Calibration claims require this to be True."""
+        try:
+            return get_provider(self.provider).is_llm
+        except KeyError:
+            return False     # unknown provider in an old cache: assume not LLM
+
+    def to_dict(self) -> dict:
+        d = {
+            "provider": self.provider,
+            "model": self.model,
+            "generated_at": self.generated_at,
+            "input_hash": self.input_hash,
+        }
+        if self.context is not None:
+            d["context"] = self.context
+        return d
+
+
+def to_belief(raw: dict) -> Belief:
+    """Validate a raw {hot,warm,cold,needs_human} dict into a Belief.
+
+    Robust to model sloppiness: clamps negatives, normalises the distribution,
+    clamps needs_human into [0, 1]. Uniform if the readiness mass is zero.
+    This is the only place the sum-to-1 invariant is established.
     """
     hot = max(0.0, float(raw.get("hot", 0.0)))
     warm = max(0.0, float(raw.get("warm", 0.0)))
     cold = max(0.0, float(raw.get("cold", 0.0)))
-    s = hot + warm + cold
-    if s <= 0.0:
+    total = hot + warm + cold
+    if total <= 0.0:
+        logger.warning("Provider returned zero readiness mass; falling back to uniform.")
         hot = warm = cold = 1.0 / 3.0
-        s = 1.0
-    readiness = {"hot": hot / s, "warm": warm / s, "cold": cold / s}
+        total = 1.0
+    readiness = {"hot": hot / total, "warm": warm / total, "cold": cold / total}
 
-    nh = float(raw.get("needs_human", 0.0))
-    nh = min(1.0, max(0.0, nh))
-    return Belief(readiness=readiness, needs_human=nh)
-
-
-# --------------------------------------------------------------------------- #
-# JSON extraction (defensive against fenced / chatty LLM output)
-# --------------------------------------------------------------------------- #
-
-def _extract_json(text: str) -> dict:
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text[:4].lower() == "json":
-            text = text[4:]
-    start, end = text.find("{"), text.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        text = text[start:end + 1]
-    return json.loads(text)
+    needs_human = min(1.0, max(0.0, float(raw.get("needs_human", 0.0))))
+    return Belief(readiness=readiness, needs_human=needs_human)
 
 
 # --------------------------------------------------------------------------- #
-# Providers. Each returns a RAW dict and raises on any failure.
-# Imports are inside the functions so the module imports fine without the SDKs.
-# --------------------------------------------------------------------------- #
-
-def _call_openai(message: str, model: str) -> dict:
-    from openai import OpenAI  # raises ImportError if not installed
-    client = OpenAI()          # reads OPENAI_API_KEY from env
-    resp = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": message},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0,
-    )
-    return _extract_json(resp.choices[0].message.content)
-
-
-def _call_google(message: str, model: str) -> dict:
-    # VERSION-SENSITIVE. This uses the newer unified `google-genai` SDK.
-    # If you're on the older `google-generativeai`, the client/config surface
-    # differs — confirm before trusting this call.
-    from google import genai
-    from google.genai import types
-    client = genai.Client()  # reads GOOGLE_API_KEY / GEMINI_API_KEY from env
-    resp = client.models.generate_content(
-        model=model,
-        contents=f"{SYSTEM_PROMPT}\n\nInbound message:\n{message}",
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            temperature=0,
-        ),
-    )
-    return _extract_json(resp.text)
-
-
-# keyword banks for the fallback. Deliberately crude — this is a floor, not a model.
-_HOT_KW = (
-    "price", "cost", "how much", "buy", "purchase", "book", "schedule",
-    "available", "availability", "deposit", "sign", "ready", "when can",
-    "today", "tomorrow", "visit", "emi", "budget", "finalize", "close",
-)
-_COLD_KW = (
-    "just looking", "just browsing", "curious", "maybe later", "not sure",
-    "someday", "no rush", "just checking", "eventually", "no hurry",
-)
-_HUMAN_KW = (
-    "legal", "lawyer", "advocate", "court", "complaint", "refund", "cheated",
-    "fraud", "manager", "contract", "terms", "guarantee", "sue", "dispute",
-    "angry", "unacceptable", "scam", "misled",
-)
-
-
-def _rule_based(message: str) -> dict:
-    """Offline fallback. Keyword-scored belief so the pipeline never hard-fails.
-    Not a serious model — it exists so a run completes with no API key."""
-    m = message.lower()
-    hot_hits = sum(kw in m for kw in _HOT_KW)
-    cold_hits = sum(kw in m for kw in _COLD_KW)
-    human_hits = sum(kw in m for kw in _HUMAN_KW)
-
-    h = 1.0 + 2.0 * hot_hits
-    c = 1.0 + 2.0 * cold_hits
-    w = 1.5  # warm baseline mass
-    total = h + w + c
-    needs = min(1.0, 0.10 + 0.25 * human_hits)
-    return {"hot": h / total, "warm": w / total, "cold": c / total, "needs_human": needs}
-
-
-# --------------------------------------------------------------------------- #
-# Provider chain
+# Provider policy. Which provider runs, and what happens when they all fail.
 # --------------------------------------------------------------------------- #
 
 def _generate_belief(
-    message: str,
-    provider: Optional[str],
-    openai_model: str,
-    google_model: str,
+    message: str, settings: Settings, context: Optional[CaseContext] = None,
 ) -> tuple[Belief, str]:
-    """Return (belief, provider_used).
+    """Return (belief, provider_name), honouring the configured provider policy.
 
-    provider=None  -> chain: openai -> google -> rule (each failure falls through).
-    provider set   -> use exactly that one. "openai"/"google" raise on failure;
-                      "rule" always succeeds. Pin a provider for testing.
+    Message and context are passed through separately; each provider decides how
+    to combine them. Rendering here instead would force the keyword provider to
+    scan generated context prose.
     """
-    if provider == "rule":
-        return _to_belief(_rule_based(message)), "rule"
-    if provider == "openai":
-        return _to_belief(_call_openai(message, openai_model)), "openai"
-    if provider == "google":
-        return _to_belief(_call_google(message, google_model)), "google"
-    if provider is not None:
-        raise ValueError(f"unknown provider: {provider!r}")
+    choice = settings.provider
 
-    # chain with fallback
-    try:
-        return _to_belief(_call_openai(message, openai_model)), "openai"
-    except Exception as e:  # noqa: BLE001 - intentional fall-through
-        logger.warning("OpenAI failed (%s); trying Google.", e)
-    try:
-        return _to_belief(_call_google(message, google_model)), "google"
-    except Exception as e:  # noqa: BLE001
-        logger.warning("Google failed (%s); falling back to rule-based.", e)
-    return _to_belief(_rule_based(message)), "rule"
+    if choice != "auto":
+        provider = get_provider(choice)
+        logger.debug("Pinned provider: %s.", provider.name)
+        return to_belief(provider.generate_raw(message, settings, context)), provider.name
+
+    failures: list[str] = []
+    for provider in llm_chain():
+        if not provider.is_available(settings):
+            failures.append(f"{provider.name}: no API key")
+            continue
+        try:
+            raw = provider.generate_raw(message, settings, context)
+            return to_belief(raw), provider.name
+        except Exception as exc:  # noqa: BLE001 - deliberate fall-through
+            failures.append(f"{provider.name}: {type(exc).__name__}: {exc}")
+            logger.warning("Provider %s failed (%s); trying the next.", provider.name, exc)
+
+    if not settings.allow_rule_fallback:
+        raise BeliefSourceError(
+            "Every real LLM provider failed and BELIEF_ALLOW_RULE_FALLBACK=false, "
+            "so no belief can be produced. Falling back to keyword scoring here "
+            "would put numbers in the cache that are indistinguishable from LLM "
+            "beliefs.\nProvider failures:\n  - " + "\n  - ".join(failures)
+        )
+
+    logger.warning(
+        "Falling back to keyword scoring. This belief is NOT LLM-derived.\n"
+        "Provider failures:\n  - %s", "\n  - ".join(failures),
+    )
+    rule = get_provider(RULE_PROVIDER)
+    return to_belief(rule.generate_raw(message, settings, context)), rule.name
 
 
 # --------------------------------------------------------------------------- #
 # Cache
 # --------------------------------------------------------------------------- #
 
-def _msg_hash(message: str) -> str:
-    return hashlib.sha256(message.encode("utf-8")).hexdigest()[:16]
+def input_hash(message: str, context: Optional[CaseContext] = None) -> str:
+    """Fingerprint of exactly what the provider was shown.
+
+    Hashes the rendered observation rather than the raw message, so a case whose
+    context changed is detected as changed. Hashing the message alone would let
+    context drift silently while the cache still reported a match.
+    """
+    return hashlib.sha256(
+        render_observation(message, context).encode("utf-8")
+    ).hexdigest()[:16]
 
 
-def _load_cache(path: str) -> dict:
-    if not os.path.exists(path):
+def _load_cache(path: Path) -> dict:
+    if not path.exists():
         return {}
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def _save_cache(path: str, cache: dict) -> None:
-    parent = os.path.dirname(path)
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+def _save_cache(path: Path, cache: dict) -> None:
+    """Write atomically: a crash mid-write must not destroy collected beliefs,
+    each of which cost an API call."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2, ensure_ascii=False, sort_keys=True)
+    os.replace(tmp, path)
 
 
 def get_belief(
     case_id: str,
     message: str,
     *,
-    provider: Optional[str] = None,
-    cache_path: str = DEFAULT_CACHE_PATH,
-    openai_model: str = DEFAULT_OPENAI_MODEL,
-    google_model: str = DEFAULT_GOOGLE_MODEL,
+    context: Optional[CaseContext] = None,
+    settings: Optional[Settings] = None,
     force_refresh: bool = False,
     refresh_on_message_change: bool = False,
-) -> Belief:
+) -> tuple[Belief, BeliefMeta]:
     """Get the belief for a case, using the cache when possible.
 
-    Cache is keyed by case_id (per the locked design). The stored entry also
-    keeps the message hash + audit fields (provider, model, timestamp) so drift
-    is auditable.
+    Returns (belief, meta). The belief is the pure distribution; the meta says
+    which provider produced it and whether it came from the cache. Check
+    `meta.is_llm` before making any calibration claim.
 
-    If a cached case_id is present but the message text has changed, that's a
-    stale-cache situation: we warn loudly. By default we still return the cached
-    belief (reproducibility wins); pass refresh_on_message_change=True to
+    `context` is optional conversation position. The belief is a pure function of
+    (message, context): both are rendered into one observation, and that
+    observation is what gets hashed, so the cache cannot report a match when the
+    context has changed underneath it.
+
+    Cache is keyed by case_id (locked design 0d). The entry stores the input hash
+    and audit fields, so drift is detectable after the fact.
+
+    If a cached case_id is present but the input has changed, that is a
+    stale-cache situation: warn loudly and, by default, still return the cached
+    belief — reproducibility wins. Pass refresh_on_message_change=True to
     regenerate instead.
     """
-    cache = _load_cache(cache_path)
+    settings = settings or load_settings()
+    cache = _load_cache(settings.cache_path)
     entry = cache.get(case_id)
-    incoming_hash = _msg_hash(message)
+    incoming_hash = input_hash(message, context)
 
     if entry is not None and not force_refresh:
-        if entry.get("msg_hash") != incoming_hash:
+        cached_hash = entry.get("input_hash")
+        stale = cached_hash != incoming_hash
+        if stale:
             logger.warning(
-                "Cache for case_id=%s was built from a DIFFERENT message "
-                "(cached hash %s != incoming %s).",
-                case_id, entry.get("msg_hash"), incoming_hash,
+                "Cache for case_id=%s was built from DIFFERENT input "
+                "(cached hash %s != incoming %s). Message or context changed.",
+                case_id, cached_hash, incoming_hash,
             )
-            if not refresh_on_message_change:
-                return Belief.from_dict(entry["belief"])
-        else:
-            return Belief.from_dict(entry["belief"])
+        if not stale or not refresh_on_message_change:
+            logger.debug("Cache hit for case_id=%s (provider=%s).",
+                         case_id, entry.get("provider"))
+            return (
+                Belief.from_dict(entry["belief"]),
+                BeliefMeta(
+                    provider=entry.get("provider", "unknown"),
+                    model=entry.get("model", "unknown"),
+                    generated_at=entry.get("generated_at", "unknown"),
+                    input_hash=cached_hash or "unknown",
+                    from_cache=True,
+                    context=entry.get("context"),
+                ),
+            )
 
-    belief, provider_used = _generate_belief(
-        message, provider, openai_model, google_model
+    logger.info("Cache miss for case_id=%s; generating a belief.", case_id)
+    belief, provider_name = _generate_belief(message, settings, context)
+
+    meta = BeliefMeta(
+        provider=provider_name,
+        model=get_provider(provider_name).model_name(settings),
+        generated_at=datetime.now(timezone.utc).isoformat(),
+        input_hash=incoming_hash,
+        from_cache=False,
+        context=context.to_dict() if context is not None else None,
     )
-    model_used = {
-        "openai": openai_model,
-        "google": google_model,
-        "rule": "rule-based",
-    }[provider_used]
 
-    cache[case_id] = {
-        "belief": belief.to_dict(),
-        "msg_hash": incoming_hash,
-        "provider": provider_used,
-        "model": model_used,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+    cache[case_id] = {"belief": belief.to_dict(), **meta.to_dict()}
+    _save_cache(settings.cache_path, cache)
+    logger.info("Stored belief for case_id=%s (provider=%s).", case_id, provider_name)
+    return belief, meta
+
+
+def cache_provenance(settings: Optional[Settings] = None) -> dict[str, int]:
+    """Count cache entries by provider.
+
+    Run this before reporting calibration. A non-zero "rule" count means the
+    cache is a mixture, and an ECE computed over it is not a statement about
+    the LLM.
+    """
+    settings = settings or load_settings()
+    counts: dict[str, int] = {}
+    for entry in _load_cache(settings.cache_path).values():
+        provider = entry.get("provider", "unknown")
+        counts[provider] = counts.get(provider, 0) + 1
+    return counts
+
+
+def assert_llm_only(settings: Optional[Settings] = None) -> None:
+    """Raise unless every cached belief came from a real model.
+
+    The check that stands between a mixed cache and a calibration claim in the
+    paper. Cheap to call; expensive to have skipped.
+    """
+    counts = cache_provenance(settings)
+    non_llm = {
+        name: n for name, n in counts.items()
+        if not (name != "unknown" and _provider_is_llm(name))
     }
-    _save_cache(cache_path, cache)
-    return belief
+    if non_llm:
+        raise BeliefSourceError(
+            "Cache is not LLM-only, so calibration figures computed over it would "
+            f"not describe the LLM. Non-LLM entries: {non_llm}. Full provenance: "
+            f"{counts}. Regenerate with BELIEF_ALLOW_RULE_FALLBACK=false."
+        )
+
+
+def _provider_is_llm(name: str) -> bool:
+    try:
+        return get_provider(name).is_llm
+    except KeyError:
+        return False
 
 
 # --------------------------------------------------------------------------- #
@@ -323,21 +423,38 @@ def get_belief(
 # --------------------------------------------------------------------------- #
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(name)s: %(message)s")
+
+    # The smoke test is explicitly an offline exercise, so it opts into the
+    # keyword floor rather than inheriting whatever the environment says. Set
+    # before load_settings() because strict mode is now the default and a
+    # keyless machine would otherwise fail validation here.
+    os.environ.setdefault("BELIEF_PROVIDER", RULE_PROVIDER)
+    os.environ.setdefault("BELIEF_ALLOW_RULE_FALLBACK", "true")
+
+    settings = load_settings(reload=True).with_overrides(
+        provider=RULE_PROVIDER,
+        allow_rule_fallback=True,
+        cache_path=Path("/tmp/_smoke_belief_cache.json"),
+    )
+    if settings.cache_path.exists():
+        settings.cache_path.unlink()
 
     samples = [
-        ("demo-hot",  "What's the price and can I book a visit this weekend?"),
-        ("demo-warm", "Just wanted to understand what options you have in this area."),
-        ("demo-cold", "Just browsing for now, no rush, maybe later this year."),
-        ("demo-human","Your agreement terms look wrong, I want to talk to a manager about a refund."),
+        ("demo-hot",   "What's the price and can I book a visit this weekend?"),
+        ("demo-warm",  "Just wanted to understand what options you have in this area."),
+        ("demo-cold",  "Just browsing for now, no rush, maybe later this year."),
+        ("demo-human", "Your agreement terms look wrong, I want to talk to a manager about a refund."),
     ]
-    test_cache = "data/_smoke_belief_cache.json"
-    if os.path.exists(test_cache):
-        os.remove(test_cache)
-
-    for cid, msg in samples:
-        b = get_belief(cid, msg, provider="rule", cache_path=test_cache)
+    for case_id, text in samples:
+        b, meta = get_belief(case_id, text, settings=settings)
         r = b.readiness
-        print(f"{cid:11s} hot={r['hot']:.2f} warm={r['warm']:.2f} "
-              f"cold={r['cold']:.2f} needs_human={b.needs_human:.2f} "
-              f"(sum={sum(r.values()):.3f})")
+        print(f"{case_id:11s} hot={r['hot']:.2f} warm={r['warm']:.2f} cold={r['cold']:.2f} "
+              f"needs_human={b.needs_human:.2f} sum={sum(r.values()):.3f} "
+              f"[{meta.provider}, llm={meta.is_llm}] -> {b.most_likely()}")
+
+    print("\ncache provenance:", cache_provenance(settings))
+    try:
+        assert_llm_only(settings)
+    except BeliefSourceError as exc:
+        print(f"\nassert_llm_only correctly refuses this cache:\n  {str(exc).splitlines()[0]}")
