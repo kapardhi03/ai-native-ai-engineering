@@ -1,0 +1,5 @@
+python-dotenv>=1.0.0
+
+# Belief providers. Optional: the rule-based fallback runs without either.
+openai>=1.0.0
+google-genai>=1.0.0

@@ -45,6 +45,11 @@ given yet, the cell says so explicitly rather than being filled with a guess.
 | 3 | 2026-08-18 | Belief must come from a real LLM call. API key supplied via `.env`, which is gitignored | Approved | *Reason not yet given — to be filled in by KK.* Consequence: the rule-based keyword fallback must not silently satisfy an experiment run. | `src/belief.py`, `.env` |
 | 4 | 2026-08-18 | "Modular" means the **wider `src/` structure**, not the log's layout | Approved | Future integrations should be easy to drop in. Clarified after ambiguity in the original instruction. | `src/` |
 | 5 | 2026-08-18 | Work proceeds one step at a time; no file is created or changed until that specific step is approved | Approved | Keeps every change traceable to an explicit decision instead of arriving in a batch. | process |
+| 6 | 2026-08-18 | Rule-based fallback **kept**, but gated: `BELIEF_ALLOW_RULE_FALLBACK` in `.env`, and the provider that produced a belief is surfaced to callers | Approved | "Offline smoke tests keep working; a real run can't silently degrade." Deleting it would break offline runs; leaving it silent would void decision 3, since a run where both APIs fail would produce keyword beliefs that look identical to LLM beliefs in the cache. | `src/config.py`, `src/belief.py` |
+| 7 | 2026-08-18 | `python-dotenv` adopted as a real dependency; `requirements.txt` created at the repo root | Approved | Chosen over a hand-rolled parser. Consequence: the repo now needs dependency management, which it had none of. `requirements.txt` added in the same step since a dependency undeclared anywhere is worse than the parser would have been. | `requirements.txt` |
+| 8 | 2026-08-18 | Cache path read from `.env` as `BELIEF_CACHE_PATH`; relative values resolve against the **repo root**, never the working directory | Approved | Closes Q3. Verified: the same relative path now resolves to one absolute path whether run from the repo root or from `when-to-escalate/`. | `src/config.py` |
+| 9 | 2026-08-18 | The restructure proceeds one sub-step at a time, committing at coherent points rather than after every file | Approved | Same reasoning as decision 5, applied to a multi-file change. | process |
+| 10 | 2026-08-18 | Config is loaded once per process and memoised; secrets are masked in `__repr__` and in `describe()` | Approved | *Reason not yet given — proposed by Claude.* A run must not see configuration change halfway through, and this repo is public, so a settings object that prints an API key into a traceback or a run log is a live leak risk. | `src/config.py` |
 
 ---
 
@@ -52,12 +57,14 @@ given yet, the cell says so explicitly rather than being filled with a guess.
 
 Not decisions yet. Listed so they are not lost between steps.
 
-| # | Question | Blocking? | Where it lands |
+| # | Question | Status | Outcome |
 | --- | --- | --- | --- |
-| Q1 | Should the rule-based fallback be deleted outright, or kept behind a flag that defaults to off and raises during experiment runs? | Blocks the restructure | Decision row, next step |
-| Q2 | `.env` is inert today — `belief.py` has no `dotenv` import and no `os.environ` read. Where does config loading live once the structure is modular? | Blocks real LLM calls | Decision row, next step |
-| Q3 | `DEFAULT_CACHE_PATH` is relative to the working directory, so running from the repo root and from `when-to-escalate/` write different caches. Anchor it to the module, the repo root, or `.env`? | Blocks the "identical beliefs" guarantee | Decision row, next step |
-| Q4 | Reasons for rows `0c`, `0e`, and `3` are still blank. | Not blocking | Fill in above |
+| Q1 | Should the rule-based fallback be deleted, or kept behind a flag? | **Closed** | Kept, gated by `BELIEF_ALLOW_RULE_FALLBACK`. See decision 6. |
+| Q2 | `.env` is inert — where does config loading live? | **Closed** | `src/config.py`, via `python-dotenv`. See decisions 7 and 10. |
+| Q3 | `DEFAULT_CACHE_PATH` is relative to the working directory. | **Closed** | Read from `.env`, resolved against the repo root. See decision 8. |
+| Q4 | Reasons for rows `0c`, `0e`, `3` and `10` are still blank. | Open | Fill in above. |
+| Q5 | `belief.py` does not yet use `config.py` — it still holds its own constants and its own relative cache path. Until it is rewired, the Q3 fix is inert in practice. | Open | Next sub-step. |
+| Q6 | Is the belief calibrated enough to threshold on (research-file Q1)? Cannot be answered while any cached belief may be keyword-derived — ECE over a mixed cache is not LLM calibration. | Open | After a real strict run. |
 
 ---
 
