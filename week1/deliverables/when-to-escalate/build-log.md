@@ -94,6 +94,25 @@ Not decisions yet. Listed so they are not lost between steps.
 
 ---
 
+## Failure analysis — kept for the paper
+
+**Context-token leakage into a keyword belief.** Rendering the conversation
+context block into *every* provider let the keyword fallback score my own
+generated prose. `"already received"` contains `"ready"`, a hot keyword, so a
+template opener with no buying signal scored hot = 0.545 instead of 0.286.
+
+Worth citing because of the shape, not the size: it pushed cold leads toward hot
+(the direction that *suppresses* escalation), the resulting belief was a valid
+distribution with a normal provenance record so nothing downstream could detect
+it, and it fired only on the archetypes that carry context — so it would have
+biased one subgroup rather than adding uniform noise.
+
+Caught by a test, not by reading the code. Fixed by decision 30. Full note in
+`src/belief.py` above `BeliefSourceError`; regression test is
+`tests/test_context.py::test_context_does_not_change_the_keyword_belief`.
+
+---
+
 ## Environment note
 
 The `.env` holding the real OpenAI and Gemini keys exists on KK's machine and is

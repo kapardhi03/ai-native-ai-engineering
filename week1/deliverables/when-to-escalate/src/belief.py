@@ -96,6 +96,38 @@ class CaseContext:
                    repeat_count=int(d.get("repeat_count", 0)))
 
 
+# --------------------------------------------------------------------------- #
+# FAILURE ANALYSIS — context-token leakage into a keyword belief
+#
+# Kept as a worked example for the paper, not just a fixed bug.
+#
+# When conversation context was first added, the rendered context block was
+# passed to every provider, including the keyword fallback. That provider scores
+# by substring match. The rendered phrase
+#
+#     "this same text was already received 4 time(s)"
+#
+# contains "ready" — a hot-readiness keyword. So a template opener carrying no
+# buying signal at all ("Hi, can I get more info") scored hot = 0.545 instead of
+# 0.286, purely because the harness told the model the message had been repeated.
+#
+# Three properties make it a good failure example:
+#   - Direction. The leak pushed cold leads toward hot, the expensive direction:
+#     it suppresses escalation on exactly the junk/blast cases that should be
+#     held, because they are the cases context is attached to.
+#   - Silence. The belief stayed a valid distribution summing to 1, was cached
+#     with a normal-looking provenance record, and nothing downstream could tell.
+#   - Correlation. It fires only where context is present — archetypes 1, 3 and
+#     11 — so it biases one subgroup and would distort a per-archetype error
+#     breakdown rather than showing up as uniform noise.
+#
+# Fix: providers receive `message` and `context` separately. Only providers that
+# send text to a model render the two together; anything that inspects the text
+# directly sees the lead's words alone. See providers/base.generate_raw and
+# tests/test_context.py::test_context_does_not_change_the_keyword_belief.
+# --------------------------------------------------------------------------- #
+
+
 class BeliefSourceError(RuntimeError):
     """No permitted provider could produce a belief.
 
