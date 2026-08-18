@@ -15,6 +15,7 @@ Two things every test here depends on.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import sys
 import types
@@ -64,12 +65,30 @@ def clean_env(monkeypatch):
 
 @pytest.fixture
 def make_settings(tmp_path):
-    """Settings built from env only — never from a .env file on disk."""
+    """A valid Settings for tests, built directly rather than from the environment.
+
+    Deliberately not routed through load_settings(): strict mode is the default
+    now, so a keyless load raises, and most tests here want a working baseline
+    rather than a re-test of configuration loading. Tests that care about how
+    configuration is *read* call load_settings() themselves.
+
+    The baseline is permissive (allow_rule_fallback=True) so that a test asking
+    for the keyword provider does not have to restate it every time. Tests of the
+    strict gate set it explicitly.
+    """
     def _make(**overrides):
         config_mod.reset_cache()
-        base = config_mod.load_settings(reload=True, load_env_files=False)
+        base = config_mod.Settings(
+            provider="auto",
+            allow_rule_fallback=True,
+            openai_model=config_mod.DEFAULT_OPENAI_MODEL,
+            google_model=config_mod.DEFAULT_GOOGLE_MODEL,
+            cache_path=tmp_path / "cache.json",
+            openai_api_key=None,
+            google_api_key=None,
+        )
         overrides.setdefault("cache_path", tmp_path / "cache.json")
-        return base.with_overrides(**overrides)
+        return config_mod._validate(dataclasses.replace(base, **overrides))
     return _make
 
 

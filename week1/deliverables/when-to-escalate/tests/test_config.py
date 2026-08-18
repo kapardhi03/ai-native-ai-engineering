@@ -12,13 +12,36 @@ import pytest
 # Defaults
 # --------------------------------------------------------------------------- #
 
-def test_defaults_when_nothing_is_set(config):
+def test_defaults_are_strict(config, monkeypatch):
+    """Build decision 21: a run that says nothing gets LLM-only, not a mixture."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     s = config.load_settings(reload=True, load_env_files=False)
     assert s.provider == "auto"
-    assert s.allow_rule_fallback is True
+    assert s.allow_rule_fallback is False
     assert s.openai_model == config.DEFAULT_OPENAI_MODEL
     assert s.google_model == config.DEFAULT_GOOGLE_MODEL
-    assert s.openai_api_key is None and s.google_api_key is None
+
+
+def test_an_unconfigured_keyless_run_is_refused(config):
+    """The safety property the default exists for. Silence must not yield keywords.
+
+    Before the default flipped, this configuration ran happily and filled the
+    cache with keyword beliefs indistinguishable from LLM ones.
+    """
+    with pytest.raises(config.ConfigError, match="neither OPENAI_API_KEY"):
+        config.load_settings(reload=True, load_env_files=False)
+
+
+def test_keyword_scoring_must_be_opted_into(config, monkeypatch):
+    """Two ways in, both explicit: pin the provider, or allow the fallback."""
+    monkeypatch.setenv("BELIEF_PROVIDER", "rule")
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
+    assert config.load_settings(reload=True, load_env_files=False).provider == "rule"
+
+    monkeypatch.delenv("BELIEF_PROVIDER")
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
+    s = config.load_settings(reload=True, load_env_files=False)
+    assert s.allow_rule_fallback is True and s.live_providers == ()
 
 
 def test_repo_root_contains_this_project(config):
@@ -52,8 +75,9 @@ def test_non_boolean_is_rejected_or_defaulted(config, monkeypatch, token):
     """Blank falls back to the default; a non-blank non-boolean is an error that
     names the variable, so a typo in .env is traceable to its line."""
     monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", token)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")   # so only the token is under test
     if not token.strip():
-        assert config.load_settings(reload=True, load_env_files=False).allow_rule_fallback is True
+        assert config.load_settings(reload=True, load_env_files=False).allow_rule_fallback is False
     else:
         with pytest.raises(config.ConfigError, match="BELIEF_ALLOW_RULE_FALLBACK"):
             config.load_settings(reload=True, load_env_files=False)
@@ -68,6 +92,10 @@ def test_valid_providers_accepted(config, monkeypatch, name):
     monkeypatch.setenv("BELIEF_PROVIDER", name)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     monkeypatch.setenv("GOOGLE_API_KEY", "g-x")
+    if name == "rule":
+        # Pinning the keyword provider under a strict default is a contradiction,
+        # and is reported as one rather than silently resolved either way.
+        monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     assert config.load_settings(reload=True, load_env_files=False).provider == name
 
 
@@ -80,6 +108,7 @@ def test_provider_is_case_insensitive(config, monkeypatch):
 @pytest.mark.parametrize("name", ["anthropic", "gpt4", "llama", "rules", "openai2"])
 def test_unknown_provider_is_rejected(config, monkeypatch, name):
     monkeypatch.setenv("BELIEF_PROVIDER", name)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     with pytest.raises(config.ConfigError, match="not recognised"):
         config.load_settings(reload=True, load_env_files=False)
 
@@ -142,9 +171,13 @@ def test_google_key_used_when_gemini_absent(config, monkeypatch):
 
 @pytest.mark.parametrize("blank", ["", "   ", "\t"])
 def test_blank_key_counts_as_unset(config, monkeypatch, blank):
-    """A commented-out or emptied .env line must not look like a usable key."""
+    """A commented-out or emptied .env line must not look like a usable key.
+
+    Under strict-by-default this is also a safety property: a blanked key must
+    stop the run, not quietly demote it to keyword scoring."""
     monkeypatch.setenv("OPENAI_API_KEY", blank)
-    assert config.load_settings(reload=True, load_env_files=False).openai_api_key is None
+    with pytest.raises(config.ConfigError):
+        config.load_settings(reload=True, load_env_files=False)
 
 
 def test_key_whitespace_is_stripped(config, monkeypatch):
@@ -159,7 +192,8 @@ def test_live_providers_order_and_membership(config, monkeypatch):
     assert config.load_settings(reload=True, load_env_files=False).live_providers == ("openai", "google")
 
 
-def test_require_key_names_the_missing_variable(config):
+def test_require_key_names_the_missing_variable(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     s = config.load_settings(reload=True, load_env_files=False)
     with pytest.raises(config.ConfigError, match="OPENAI_API_KEY"):
         s.require_key("openai")
@@ -200,6 +234,7 @@ REL = "week1/deliverables/when-to-escalate/data/belief_cache.json"
 
 
 def test_relative_path_is_independent_of_cwd(config, monkeypatch, tmp_path):
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     monkeypatch.setenv("BELIEF_CACHE_PATH", REL)
     origin = Path.cwd()
     try:
@@ -213,17 +248,20 @@ def test_relative_path_is_independent_of_cwd(config, monkeypatch, tmp_path):
 
 
 def test_resolved_path_is_absolute(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     monkeypatch.setenv("BELIEF_CACHE_PATH", REL)
     assert config.load_settings(reload=True, load_env_files=False).cache_path.is_absolute()
 
 
 def test_absolute_path_is_preserved(config, monkeypatch, tmp_path):
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     target = tmp_path / "somewhere" / "c.json"
     monkeypatch.setenv("BELIEF_CACHE_PATH", str(target))
     assert config.load_settings(reload=True, load_env_files=False).cache_path == target.resolve()
 
 
 def test_tilde_is_expanded(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
     monkeypatch.setenv("BELIEF_CACHE_PATH", "~/beliefs.json")
     got = config.load_settings(reload=True, load_env_files=False).cache_path
     assert "~" not in str(got) and got.is_absolute()
@@ -234,18 +272,21 @@ def test_tilde_is_expanded(config, monkeypatch):
 # --------------------------------------------------------------------------- #
 
 def test_settings_are_memoised(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     first = config.load_settings(reload=True, load_env_files=False)
     monkeypatch.setenv("OPENAI_MODEL", "gpt-changed")
     assert config.load_settings(load_env_files=False) is first
 
 
 def test_reload_picks_up_changes(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     config.load_settings(reload=True, load_env_files=False)
     monkeypatch.setenv("OPENAI_MODEL", "gpt-changed")
     assert config.load_settings(reload=True, load_env_files=False).openai_model == "gpt-changed"
 
 
 def test_reset_cache_forces_a_rebuild(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     first = config.load_settings(reload=True, load_env_files=False)
     config.reset_cache()
     assert config.load_settings(load_env_files=False) is not first
@@ -255,25 +296,29 @@ def test_reset_cache_forces_a_rebuild(config, monkeypatch):
 # Overrides
 # --------------------------------------------------------------------------- #
 
-def test_settings_are_frozen(config):
+def test_settings_are_frozen(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     s = config.load_settings(reload=True, load_env_files=False)
     with pytest.raises(Exception):
         s.provider = "openai"
 
 
-def test_with_overrides_does_not_mutate_the_original(config):
+def test_with_overrides_does_not_mutate_the_original(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     s = config.load_settings(reload=True, load_env_files=False)
     other = s.with_overrides(openai_model="gpt-other")
     assert s.openai_model != "gpt-other" and other.openai_model == "gpt-other"
 
 
-def test_with_overrides_still_validates(config):
+def test_with_overrides_still_validates(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     s = config.load_settings(reload=True, load_env_files=False)
     with pytest.raises(config.ConfigError):
         s.with_overrides(provider="rule", allow_rule_fallback=False)
 
 
-def test_with_overrides_does_not_touch_environment(config):
+def test_with_overrides_does_not_touch_environment(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     s = config.load_settings(reload=True, load_env_files=False)
     s.with_overrides(openai_model="gpt-other")
     assert "OPENAI_MODEL" not in os.environ
@@ -285,7 +330,7 @@ def test_with_overrides_does_not_touch_environment(config):
 
 def test_env_file_is_read(config, monkeypatch, tmp_path):
     env = tmp_path / ".env"
-    env.write_text("OPENAI_MODEL=gpt-from-file\n")
+    env.write_text("OPENAI_MODEL=gpt-from-file\nOPENAI_API_KEY=sk-from-file\n")
     monkeypatch.setattr(config, "_env_candidates", lambda: [env])
     s = config.load_settings(reload=True)
     assert s.openai_model == "gpt-from-file" and env in s.env_files
@@ -294,12 +339,13 @@ def test_env_file_is_read(config, monkeypatch, tmp_path):
 def test_real_environment_beats_the_env_file(config, monkeypatch, tmp_path):
     """CI secrets and an explicit export must not be clobbered by a stale file."""
     env = tmp_path / ".env"
-    env.write_text("OPENAI_MODEL=gpt-from-file\n")
+    env.write_text("OPENAI_MODEL=gpt-from-file\nOPENAI_API_KEY=sk-from-file\n")
     monkeypatch.setattr(config, "_env_candidates", lambda: [env])
     monkeypatch.setenv("OPENAI_MODEL", "gpt-from-shell")
     assert config.load_settings(reload=True).openai_model == "gpt-from-shell"
 
 
 def test_missing_env_file_is_not_fatal(config, monkeypatch, tmp_path):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     monkeypatch.setattr(config, "_env_candidates", lambda: [tmp_path / "absent"])
     assert config.load_settings(reload=True).env_files == ()

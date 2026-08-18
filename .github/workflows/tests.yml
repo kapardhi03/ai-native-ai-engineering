@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # No secrets are configured for this job, and none are needed: the suite
+      # stubs both SDKs and asserts that no test reaches the network. A test that
+      # started making real calls would fail here rather than quietly bill someone.
+      - name: Run tests
+        run: python -m pytest week1/deliverables/when-to-escalate
+
+      - name: Offline smoke test
+        run: python week1/deliverables/when-to-escalate/src/belief.py

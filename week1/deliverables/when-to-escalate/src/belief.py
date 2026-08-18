@@ -325,7 +325,14 @@ def _provider_is_llm(name: str) -> bool:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(name)s: %(message)s")
 
-    settings = load_settings().with_overrides(
+    # The smoke test is explicitly an offline exercise, so it opts into the
+    # keyword floor rather than inheriting whatever the environment says. Set
+    # before load_settings() because strict mode is now the default and a
+    # keyless machine would otherwise fail validation here.
+    os.environ.setdefault("BELIEF_PROVIDER", RULE_PROVIDER)
+    os.environ.setdefault("BELIEF_ALLOW_RULE_FALLBACK", "true")
+
+    settings = load_settings(reload=True).with_overrides(
         provider=RULE_PROVIDER,
         allow_rule_fallback=True,
         cache_path=Path("/tmp/_smoke_belief_cache.json"),

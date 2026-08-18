@@ -53,7 +53,12 @@ def valid_providers() -> tuple[str, ...]:
     return (AUTO_PROVIDER, *available_providers())
 
 DEFAULT_PROVIDER = AUTO_PROVIDER
-DEFAULT_ALLOW_RULE_FALLBACK = True
+# Strict by default (build decision 21). An unconfigured run must not be able to
+# produce a cache mixing LLM beliefs with keyword beliefs, because a calibration
+# figure computed over that mixture describes neither source. Opting into the
+# keyword floor is deliberate: set BELIEF_ALLOW_RULE_FALLBACK=true, or pin
+# BELIEF_PROVIDER=rule.
+DEFAULT_ALLOW_RULE_FALLBACK = False
 DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
 DEFAULT_GOOGLE_MODEL = "gemini-2.0-flash"
 DEFAULT_CACHE_PATH = "week1/deliverables/when-to-escalate/data/belief_cache.json"
@@ -329,5 +334,10 @@ def reset_cache() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(name)s: %(message)s")
-    print(load_settings().describe())
+    # Diagnostic entry point: `python config.py` answers "will a real run work?"
+    logging.basicConfig(level=logging.WARNING, format="%(levelname)-7s %(name)s: %(message)s")
+    try:
+        print(load_settings().describe())
+    except ConfigError as exc:
+        print(f"Configuration is not usable:\n\n  {exc}\n")
+        raise SystemExit(1)
