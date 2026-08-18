@@ -106,6 +106,20 @@ Not decisions yet. Listed so they are not lost between steps.
 
 ---
 
+## Limitations to carry into the paper
+
+Recorded here as they surface, so the limitations section is written from a list
+rather than from memory.
+
+| # | Limitation | Where it came from |
+| --- | --- | --- |
+| L1 | The `needs_human` base rate in `data/cases.json` is 42%, far above a real inbound stream. Inflated deliberately so the asymmetry is measurable, but it means **precision and recall on this set will not transfer to production base rates**. | Decision 31, Q14 |
+| L2 | Non-leads — competitor fishing, abuse, spam blasts — are labelled `cold` rather than given their own state. A known approximation; readiness calibration is slightly distorted by it. | Decision 27 |
+| L3 | Readiness labels are *authored intent*, not observed outcomes. Calibration on readiness measures agreement with my labelling, not with what the lead actually did. `needs_human` labels are stronger, being true by construction. | Two-label decision |
+| L4 | The synthetic set makes missed escalation measurable precisely because it is not real. In production there is no follow-up signal, so recall would be unmeasurable — this is the trade the set makes. | research-file Q6 |
+
+---
+
 ## Failure analysis — kept for the paper
 
 **Context-token leakage into a keyword belief.** Rendering the conversation
