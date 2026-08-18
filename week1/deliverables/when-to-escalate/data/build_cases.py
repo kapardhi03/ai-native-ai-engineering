@@ -3,10 +3,18 @@ import json, random
 from collections import Counter
 
 C = []
-def add(arch, name, variant, msg, readiness, needs_human, turn=0, repeat=0, note=""):
+def add(arch, name, variant, msg, readiness, needs_human, turn=0, repeat=0, note="",
+        constraints=()):
+    """constraints: hard rules that remove actions from the feasible set entirely.
+
+    These ride on the case rather than on the belief, because the belief cannot
+    encode "this message asks for land papers". See build-log L6: the constraint
+    is treated as observable and error-free, which a production detector is not.
+    """
     C.append(dict(archetype=arch, archetype_name=name, variant=variant, message=msg,
                   context=dict(turn_index=turn, repeat_count=repeat),
-                  labels=dict(readiness=readiness, needs_human=needs_human), notes=note))
+                  labels=dict(readiness=readiness, needs_human=needs_human),
+                  constraints=list(constraints), notes=note))
 
 # 1 — template opener (10): 6 first-contact, 4 repeated blast
 A1 = "template opener"
@@ -57,12 +65,14 @@ for m in ["Can you send me the land papers?",
           "Share the title deed, I'll get it verified before paying",
           "I need the sale agreement draft before I transfer the token",
           "Send the EC and the mother deed today, my lawyer is waiting"]:
-    add(5, A5, "5a-restricted", m, "hot", True, 2, 0, "HARD CONSTRAINT — never send legal docs")
+    add(5, A5, "5a-restricted", m, "hot", True, 2, 0, "HARD CONSTRAINT — never send legal docs",
+        constraints=("no_direct_answer",))
 for m in ["Can you guarantee the title is clear?",
           "Is there any litigation on this land? Give it in writing",
           "Send the legal documents for my advocate to check",
           "What guarantee do I have that the papers are genuine?"]:
-    add(5, A5, "5a-restricted", m, "warm", True, 2, 0, "HARD CONSTRAINT — no written guarantee")
+    add(5, A5, "5a-restricted", m, "warm", True, 2, 0, "HARD CONSTRAINT — no written guarantee",
+        constraints=("no_direct_answer",))
 for m in ["Is this HMDA approved?", "Can you share the HMDA approval number?",
           "Is the layout LP number available publicly?",
           "Is it RERA registered? What's the registration number"]:
@@ -175,6 +185,10 @@ for n, c in enumerate(C, 1):
 out = {"schema_version": 1, "seed": SEED, "n_cases": len(C),
        "split_method": "stratified by archetype and sub-variant, seeded",
        "readiness_states": ["hot", "warm", "cold"],
+       "constraint_semantics": {
+           "no_direct_answer": ("Removes the 'answer' action from the feasible set "
+                                "entirely. Not a priced cell — no belief, however "
+                                "confident, can select it.")},
        "note": ("Synthetic. No product name, client data, or real message content. "
                 "Non-leads (competitor, abuse, blast) are labelled cold as a known "
                 "approximation — see build-log decision 27."),

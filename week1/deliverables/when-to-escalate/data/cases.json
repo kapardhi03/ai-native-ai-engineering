@@ -8,6 +8,9 @@
     "warm",
     "cold"
   ],
+  "constraint_semantics": {
+    "no_direct_answer": "Removes the 'answer' action from the feasible set entirely. Not a priced cell — no belief, however confident, can select it."
+  },
   "note": "Synthetic. No product name, client data, or real message content. Non-leads (competitor, abuse, blast) are labelled cold as a known approximation — see build-log decision 27.",
   "cases": [
     {
@@ -23,6 +26,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "test",
       "case_id": "a01-first-001"
@@ -40,6 +44,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "dev",
       "case_id": "a01-first-002"
@@ -57,6 +62,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "test",
       "case_id": "a01-first-003"
@@ -74,6 +80,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "test",
       "case_id": "a01-first-004"
@@ -91,6 +98,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "dev",
       "case_id": "a01-first-005"
@@ -108,6 +116,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "low signal, first contact — answer and draw out",
       "split": "dev",
       "case_id": "a01-first-006"
@@ -125,6 +134,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "identical text repeated — likely blast, hold/junk",
       "split": "dev",
       "case_id": "a01-blast-007"
@@ -142,6 +152,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "identical text repeated — likely blast, hold/junk",
       "split": "dev",
       "case_id": "a01-blast-008"
@@ -159,6 +170,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "identical text repeated — likely blast, hold/junk",
       "split": "test",
       "case_id": "a01-blast-009"
@@ -176,6 +188,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "identical text repeated — likely blast, hold/junk",
       "split": "test",
       "case_id": "a01-blast-010"
@@ -193,6 +206,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "routine early request — send and wait",
       "split": "dev",
       "case_id": "a02-early-011"
@@ -210,6 +224,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "routine early request — send and wait",
       "split": "dev",
       "case_id": "a02-early-012"
@@ -227,6 +242,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "routine early request — send and wait",
       "split": "test",
       "case_id": "a02-early-013"
@@ -244,6 +260,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "routine early request — send and wait",
       "split": "test",
       "case_id": "a02-early-014"
@@ -261,6 +278,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "proof demand late in convo — send + notify a human",
       "split": "test",
       "case_id": "a02-deep-015"
@@ -278,6 +296,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "proof demand late in convo — send + notify a human",
       "split": "dev",
       "case_id": "a02-deep-016"
@@ -295,6 +314,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "proof demand late in convo — send + notify a human",
       "split": "test",
       "case_id": "a02-deep-017"
@@ -312,6 +332,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "proof demand late in convo — send + notify a human",
       "split": "dev",
       "case_id": "a02-deep-018"
@@ -329,6 +350,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "almost no signal — ask, draw them out",
       "split": "test",
       "case_id": "a03-first-019"
@@ -346,6 +368,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "almost no signal — ask, draw them out",
       "split": "dev",
       "case_id": "a03-first-020"
@@ -363,6 +386,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "almost no signal — ask, draw them out",
       "split": "test",
       "case_id": "a03-first-021"
@@ -380,6 +404,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "almost no signal — ask, draw them out",
       "split": "dev",
       "case_id": "a03-first-022"
@@ -397,6 +422,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "re-ping mid-convo — genuine lead, notify",
       "split": "test",
       "case_id": "a03-followup-023"
@@ -414,6 +440,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "re-ping mid-convo — genuine lead, notify",
       "split": "dev",
       "case_id": "a03-followup-024"
@@ -431,6 +458,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "re-ping mid-convo — genuine lead, notify",
       "split": "dev",
       "case_id": "a03-followup-025"
@@ -448,6 +476,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "re-ping mid-convo — genuine lead, notify",
       "split": "test",
       "case_id": "a03-followup-026"
@@ -465,6 +494,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "dev",
       "case_id": "a04-answerable-027"
@@ -482,6 +512,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "test",
       "case_id": "a04-answerable-028"
@@ -499,6 +530,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "test",
       "case_id": "a04-answerable-029"
@@ -516,6 +548,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "test",
       "case_id": "a04-answerable-030"
@@ -533,6 +566,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "test",
       "case_id": "a04-answerable-031"
@@ -550,6 +584,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "dev",
       "case_id": "a04-answerable-032"
@@ -567,6 +602,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "dev",
       "case_id": "a04-answerable-033"
@@ -584,6 +620,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "hot intent, answerable without a human",
       "split": "dev",
       "case_id": "a04-answerable-034"
@@ -601,6 +638,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "test",
       "case_id": "a04-booking-035"
@@ -618,6 +656,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "dev",
       "case_id": "a04-booking-036"
@@ -635,6 +674,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "dev",
       "case_id": "a04-booking-037"
@@ -652,6 +692,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "test",
       "case_id": "a04-booking-038"
@@ -669,6 +710,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "dev",
       "case_id": "a04-booking-039"
@@ -686,6 +728,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "test",
       "case_id": "a04-booking-040"
@@ -703,6 +746,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "test",
       "case_id": "a04-booking-041"
@@ -720,6 +764,7 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "hot AND needs a human to actually book",
       "split": "dev",
       "case_id": "a04-booking-042"
@@ -737,6 +782,9 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — never send legal docs",
       "split": "test",
       "case_id": "a05-restricted-043"
@@ -754,6 +802,9 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — never send legal docs",
       "split": "test",
       "case_id": "a05-restricted-044"
@@ -771,6 +822,9 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — never send legal docs",
       "split": "dev",
       "case_id": "a05-restricted-045"
@@ -788,6 +842,9 @@
         "readiness": "hot",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — never send legal docs",
       "split": "test",
       "case_id": "a05-restricted-046"
@@ -805,6 +862,9 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — no written guarantee",
       "split": "dev",
       "case_id": "a05-restricted-047"
@@ -822,6 +882,9 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — no written guarantee",
       "split": "dev",
       "case_id": "a05-restricted-048"
@@ -839,6 +902,9 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — no written guarantee",
       "split": "test",
       "case_id": "a05-restricted-049"
@@ -856,6 +922,9 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [
+        "no_direct_answer"
+      ],
       "notes": "HARD CONSTRAINT — no written guarantee",
       "split": "dev",
       "case_id": "a05-restricted-050"
@@ -873,6 +942,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "legal-SOUNDING but public info — must NOT over-escalate",
       "split": "dev",
       "case_id": "a05-public-051"
@@ -890,6 +960,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "legal-SOUNDING but public info — must NOT over-escalate",
       "split": "test",
       "case_id": "a05-public-052"
@@ -907,6 +978,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "legal-SOUNDING but public info — must NOT over-escalate",
       "split": "dev",
       "case_id": "a05-public-053"
@@ -924,6 +996,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "legal-SOUNDING but public info — must NOT over-escalate",
       "split": "test",
       "case_id": "a05-public-054"
@@ -941,6 +1014,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "test",
       "case_id": "a06-frustrated-055"
@@ -958,6 +1032,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "dev",
       "case_id": "a06-frustrated-056"
@@ -975,6 +1050,7 @@
         "readiness": "warm",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "dev",
       "case_id": "a06-frustrated-057"
@@ -992,6 +1068,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "dev",
       "case_id": "a06-frustrated-058"
@@ -1009,6 +1086,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "test",
       "case_id": "a06-frustrated-059"
@@ -1026,6 +1104,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "trust broken — stop and escalate-pause",
       "split": "test",
       "case_id": "a06-frustrated-060"
@@ -1043,6 +1122,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "light curiosity — answerable, must not over-escalate",
       "split": "test",
       "case_id": "a06-mild-061"
@@ -1060,6 +1140,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "light curiosity — answerable, must not over-escalate",
       "split": "dev",
       "case_id": "a06-mild-062"
@@ -1077,6 +1158,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "answer listed price only",
       "split": "dev",
       "case_id": "a07-price-063"
@@ -1094,6 +1176,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "answer listed price only",
       "split": "test",
       "case_id": "a07-price-064"
@@ -1111,6 +1194,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "answer listed price only",
       "split": "dev",
       "case_id": "a07-price-065"
@@ -1128,6 +1212,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "answer listed price only",
       "split": "test",
       "case_id": "a07-price-066"
@@ -1145,6 +1230,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "fishing for internal margins — escalate",
       "split": "dev",
       "case_id": "a07-internals-067"
@@ -1162,6 +1248,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "fishing for internal margins — escalate",
       "split": "test",
       "case_id": "a07-internals-068"
@@ -1179,6 +1266,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "fishing for internal margins — escalate",
       "split": "dev",
       "case_id": "a07-internals-069"
@@ -1196,6 +1284,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "fishing for internal margins — escalate",
       "split": "test",
       "case_id": "a07-internals-070"
@@ -1213,6 +1302,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "no text to read — transcribe, then continue",
       "split": "test",
       "case_id": "a08-voice-071"
@@ -1230,6 +1320,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "no text to read — transcribe, then continue",
       "split": "test",
       "case_id": "a08-voice-072"
@@ -1247,6 +1338,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "no text to read — transcribe, then continue",
       "split": "dev",
       "case_id": "a08-voice-073"
@@ -1264,6 +1356,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "no text to read — transcribe, then continue",
       "split": "dev",
       "case_id": "a08-voice-074"
@@ -1281,6 +1374,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "bare reaction — stay quiet, hold",
       "split": "test",
       "case_id": "a08-reaction-075"
@@ -1298,6 +1392,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "bare reaction — stay quiet, hold",
       "split": "test",
       "case_id": "a08-reaction-076"
@@ -1315,6 +1410,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "bare reaction — stay quiet, hold",
       "split": "dev",
       "case_id": "a08-reaction-077"
@@ -1332,6 +1428,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "bare reaction — stay quiet, hold",
       "split": "dev",
       "case_id": "a08-reaction-078"
@@ -1349,6 +1446,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "dev",
       "case_id": "a09-oversharer-079"
@@ -1366,6 +1464,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "dev",
       "case_id": "a09-oversharer-080"
@@ -1383,6 +1482,7 @@
         "readiness": "hot",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "dev",
       "case_id": "a09-oversharer-081"
@@ -1400,6 +1500,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "test",
       "case_id": "a09-oversharer-082"
@@ -1417,6 +1518,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "test",
       "case_id": "a09-oversharer-083"
@@ -1434,6 +1536,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "long input, bounded reply — no human needed",
       "split": "test",
       "case_id": "a09-oversharer-084"
@@ -1451,6 +1554,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "test",
       "case_id": "a10-early-085"
@@ -1468,6 +1572,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "test",
       "case_id": "a10-early-086"
@@ -1485,6 +1590,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "dev",
       "case_id": "a10-early-087"
@@ -1502,6 +1608,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "dev",
       "case_id": "a10-early-088"
@@ -1519,6 +1626,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "test",
       "case_id": "a10-early-089"
@@ -1536,6 +1644,7 @@
         "readiness": "warm",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "repetitive but still plausible — restricted answer",
       "split": "dev",
       "case_id": "a10-early-090"
@@ -1553,6 +1662,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "never commits — hand off, escalate-notify",
       "split": "test",
       "case_id": "a10-persistent-091"
@@ -1570,6 +1680,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "never commits — hand off, escalate-notify",
       "split": "test",
       "case_id": "a10-persistent-092"
@@ -1587,6 +1698,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "never commits — hand off, escalate-notify",
       "split": "dev",
       "case_id": "a10-persistent-093"
@@ -1604,6 +1716,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "never commits — hand off, escalate-notify",
       "split": "dev",
       "case_id": "a10-persistent-094"
@@ -1621,6 +1734,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "first instance — hold, do not engage",
       "split": "dev",
       "case_id": "a11-first-095"
@@ -1638,6 +1752,7 @@
         "readiness": "cold",
         "needs_human": false
       },
+      "constraints": [],
       "notes": "first instance — hold, do not engage",
       "split": "test",
       "case_id": "a11-first-096"
@@ -1655,6 +1770,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "repeated — stop responding, escalate-pause",
       "split": "dev",
       "case_id": "a11-repeated-097"
@@ -1672,6 +1788,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "repeated — stop responding, escalate-pause",
       "split": "test",
       "case_id": "a11-repeated-098"
@@ -1689,6 +1806,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "repeated — stop responding, escalate-pause",
       "split": "dev",
       "case_id": "a11-repeated-099"
@@ -1706,6 +1824,7 @@
         "readiness": "cold",
         "needs_human": true
       },
+      "constraints": [],
       "notes": "repeated — stop responding, escalate-pause",
       "split": "test",
       "case_id": "a11-repeated-100"

@@ -79,6 +79,11 @@ given yet, the cell says so explicitly rather than being filled with a guess.
 | 37 | 2026-08-18 | **Cost: needless ask = 2** | Approved | Cheapest. One question, mild friction, keeps the lead alive and improves the belief for the next turn. My earlier 7 would have made "ask" a dead action and pre-answered research-file Q2 in the wrong direction. | cost matrix |
 | 38 | 2026-08-18 | **Cost: correct actions = 0; correct escalate-pause = 1 residual** | Approved | Human time plus a brief wait, so the policy does not treat correct pausing as free and over-escalate. | cost matrix |
 | 39 | 2026-08-18 | `tests/test_cases.py` added: validates the committed case set | Approved | *Reason not yet given — proposed by Claude.* `data/cases.json` is what the reported numbers are computed over. A hand-edited label, a lost case, or a split that stopped being balanced would change published results with nothing to notice. | `tests/test_cases.py` |
+| 40 | 2026-08-18 | Full 30-cell cost matrix approved as proposed | Approved | The additivity reasoning is right — hold on hot+needs-human is 8, not 16. The harms overlap, they don't stack; anything above 10 would break the false-assertion-is-top framing. No hotness premium on a false answer. | `src/costs.py` |
+| 41 | 2026-08-18 | `escalate-pause` stays constraint-driven and is never the minimum-expected-cost action | Approved | Correct by design, not a repeat of the "ask" bug. Pause is an emergency stop, not a routine cost choice — you pause because continuing is unacceptable, not because it's cheapest. Unlike "ask", it is not supposed to win on price. To be stated in the paper as finding F1 so it does not read as an accident. | `src/costs.py`, paper |
+| 42 | 2026-08-18 | `"constraints": ["no_direct_answer"]` added to the 8 restricted cases; regenerated with the same seed and split | Approved | The constraint rides on the case because the belief cannot encode it. Verified: case ids, labels and split are byte-identical to the previous generation; only the new field differs. | `data/cases.json` |
+| 43 | 2026-08-18 | `src/costs.py` written; the hard constraint is enforced as **infeasibility**, never as a price | Approved | A constraint expressed as a large number can be outbid by a sufficiently confident belief, which is exactly what a hard constraint must forbid. Confirmed by a test that sets `answer` to cost 0 in every state and shows a constrained case still refuses it. | `src/costs.py` |
+| 44 | 2026-08-18 | Baseline `UNIFORM_COST` is **derived** from `COST` (0 stays 0, every non-zero becomes 1) rather than hand-written | Approved | *Reason not yet given — proposed by Claude.* Keeps the two policies agreeing on which action is correct in each state, so the only difference is the magnitude of the asymmetry. A hand-written baseline could disagree about correctness, and the comparison would then measure two different notions of "right" instead of the value of pricing errors differently. | `src/costs.py` |
 
 ---
 
@@ -117,6 +122,18 @@ rather than from memory.
 | L2 | Non-leads — competitor fishing, abuse, spam blasts — are labelled `cold` rather than given their own state. A known approximation; readiness calibration is slightly distorted by it. | Decision 27 |
 | L3 | Readiness labels are *authored intent*, not observed outcomes. Calibration on readiness measures agreement with my labelling, not with what the lead actually did. `needs_human` labels are stronger, being true by construction. | Two-label decision |
 | L4 | The synthetic set makes missed escalation measurable precisely because it is not real. In production there is no follow-up signal, so recall would be unmeasurable — this is the trade the set makes. | research-file Q6 |
+| L5 | The state space is **too coarse to separate competitor-fishing from abuse**: both are `(cold, needs_human=True)`, yet the archetypes want different actions — answer-price-only versus stop-and-pause. The cost matrix cannot price them differently. Evidence that a richer state, or a separate intent flag alongside readiness, would be needed. A real finding about the factorisation, not a confession. | Decision 40, Q2 ruling |
+| L6 | The hard constraint is treated as **observable and error-free**, while the hidden state is not. `constraints` rides on the case; in production a detector would fire it and would carry its own false-positive and false-negative rates, which this experiment does not model. | Decision 42, Q3 ruling |
+
+---
+
+## Findings for the paper
+
+| # | Finding | Evidence |
+| --- | --- | --- |
+| F1 | **`escalate-pause` is never the minimum-expected-cost action.** Swept across the belief simplex it is never chosen on price; it is invoked only by the hard constraint. This is the correct shape for an emergency stop — you pause because continuing is unacceptable, not because it is cheapest — and is stated as a design finding rather than left to look like an accident. | `tests/test_costs.py::test_pause_is_never_the_cheapest_action` |
+| F2 | **Single-message belief is insufficient for roughly a third of the archetypes.** Archetypes 1, 3 and 11 need conversation position to be decidable at all. Answers research-file question 8. | Decision 26, `data/cases.json` |
+| F3 | **The cost-aware policy and the uniform baseline disagree over a wide band of beliefs**, not just at the edges — the baseline keeps answering while the cost-aware policy escalates, from around P(needs_human) ≈ 0.3 upward at high readiness. | `tests/test_costs.py::test_baseline_and_real_matrix_can_disagree` |
 
 ---
 

@@ -56,7 +56,7 @@ def test_case_ids_are_unique(cases):
 
 def test_every_case_has_the_full_schema(cases):
     expected = {"case_id", "archetype", "archetype_name", "variant", "message",
-                "context", "labels", "split", "notes"}
+                "context", "labels", "constraints", "split", "notes"}
     for c in cases:
         assert set(c) == expected, c["case_id"]
 
@@ -130,6 +130,28 @@ def test_public_legal_cases_are_not_escalations(cases):
 # --------------------------------------------------------------------------- #
 # Context
 # --------------------------------------------------------------------------- #
+
+def test_only_the_restricted_variant_is_constrained(cases):
+    """The hard constraint rides on the case because the belief cannot encode
+    "this message asks for land papers". See build-log L6."""
+    constrained = [c for c in cases if c["constraints"]]
+    assert len(constrained) == 8
+    assert {c["variant"] for c in constrained} == {"5a-restricted"}
+    assert all(c["constraints"] == ["no_direct_answer"] for c in constrained)
+
+
+def test_every_constraint_is_known_to_the_cost_model(cases):
+    import costs
+    for c in cases:
+        for name in c["constraints"]:
+            assert name in costs.CONSTRAINT_FORBIDS, c["case_id"]
+
+
+def test_constraint_semantics_are_documented_in_the_file(data):
+    """A reader of data/ must be able to tell a constraint from a big number."""
+    assert "no_direct_answer" in data["constraint_semantics"]
+    assert "feasible set" in data["constraint_semantics"]["no_direct_answer"]
+
 
 def test_context_fields_are_non_negative_ints(cases):
     for c in cases:
