@@ -50,6 +50,10 @@ given yet, the cell says so explicitly rather than being filled with a guess.
 | 8 | 2026-08-18 | Cache path read from `.env` as `BELIEF_CACHE_PATH`; relative values resolve against the **repo root**, never the working directory | Approved | Closes Q3. Verified: the same relative path now resolves to one absolute path whether run from the repo root or from `when-to-escalate/`. | `src/config.py` |
 | 9 | 2026-08-18 | The restructure proceeds one sub-step at a time, committing at coherent points rather than after every file | Approved | Same reasoning as decision 5, applied to a multi-file change. | process |
 | 10 | 2026-08-18 | Config is loaded once per process and memoised; secrets are masked in `__repr__` and in `describe()` | Approved | *Reason not yet given — proposed by Claude.* A run must not see configuration change halfway through, and this repo is public, so a settings object that prints an API key into a traceback or a run log is a live leak risk. | `src/config.py` |
+| 11 | 2026-08-18 | `Belief` stays the pure mathematical object; provenance moves to a separate `BeliefMeta`. `get_belief()` returns the pair | Approved | "Put it separate." Keeps the code's `Belief` identical to the paper's belief, so bookkeeping never contaminates the object the policy reasons over. Cost: callers unpack a tuple. | `src/belief.py` |
+| 12 | 2026-08-18 | `belief.py` rewired onto `config.py`: no module constants, no ambient env reads, keys passed explicitly into each provider | Approved | Closes Q5. Makes the Q3 cache-path fix actually take effect, and makes `config.py` the only place configuration resolves. | `src/belief.py` |
+| 13 | 2026-08-18 | Cache writes are atomic (temp file + `os.replace`) | Approved | *Reason not yet given — proposed by Claude.* The previous version truncated the real cache before writing, so a crash or interrupt mid-write destroyed every belief already collected — expensive, since each one costs an API call. | `src/belief.py` |
+| 14 | 2026-08-18 | `cache_provenance()` added: counts cache entries by provider | Approved | *Reason not yet given — proposed by Claude.* Makes Q6 checkable in one call before reporting calibration, rather than relying on remembering how a run went. | `src/belief.py` |
 
 ---
 
@@ -62,9 +66,11 @@ Not decisions yet. Listed so they are not lost between steps.
 | Q1 | Should the rule-based fallback be deleted, or kept behind a flag? | **Closed** | Kept, gated by `BELIEF_ALLOW_RULE_FALLBACK`. See decision 6. |
 | Q2 | `.env` is inert — where does config loading live? | **Closed** | `src/config.py`, via `python-dotenv`. See decisions 7 and 10. |
 | Q3 | `DEFAULT_CACHE_PATH` is relative to the working directory. | **Closed** | Read from `.env`, resolved against the repo root. See decision 8. |
-| Q4 | Reasons for rows `0c`, `0e`, `3` and `10` are still blank. | Open | Fill in above. |
-| Q5 | `belief.py` does not yet use `config.py` — it still holds its own constants and its own relative cache path. Until it is rewired, the Q3 fix is inert in practice. | Open | Next sub-step. |
-| Q6 | Is the belief calibrated enough to threshold on (research-file Q1)? Cannot be answered while any cached belief may be keyword-derived — ECE over a mixed cache is not LLM calibration. | Open | After a real strict run. |
+| Q4 | Reasons for rows `0c`, `0e`, `3`, `10`, `13` and `14` are still blank. | Open | Fill in above. |
+| Q5 | `belief.py` does not yet use `config.py`. | **Closed** | Rewired. See decision 12. |
+| Q6 | Is the belief calibrated enough to threshold on (research-file Q1)? Cannot be answered while any cached belief may be keyword-derived — ECE over a mixed cache is not LLM calibration. | Open | Now checkable via `cache_provenance()`. Needs a real strict run, which must happen on KK's machine — the build container has no keys. |
+| Q7 | Providers still live inside `belief.py`. Adding one means editing the belief module. Extract to `src/providers/`? | Open | Proposed as the next sub-step. |
+| Q8 | No test file exists. The checks run so far were throwaway scripts, so nothing re-runs them on a later change. | Open | Undecided. |
 
 ---
 
