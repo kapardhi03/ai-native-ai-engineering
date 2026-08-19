@@ -13,8 +13,12 @@ Hidden Intent**
 ## Problem
 
 The agent observes an inbound message from a sales lead. It must select one action
-from {answer, ask a qualifying question, hold, escalate to a human} because the
-lead's true intent and buying-readiness are not known.
+from {`answer`, `ask`, `hold`, `escalate_notify`, `escalate_pause`} because the
+lead's true intent and buying-readiness are not known. `ask` is a qualifying
+question rather than an answer; `escalate_notify` tells a human while the
+conversation continues; `escalate_pause` stops the agent and hands over. The two
+escalations are separate actions because they carry different costs (build
+decision 25, superseding the original four-action set).
 
 The agent holds a belief over the lead's hidden intent and readiness and chooses
 the action with the lowest expected cost, then is compared against a baseline. The
