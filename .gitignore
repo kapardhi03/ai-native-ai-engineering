@@ -17,3 +17,5 @@ week1/deliverables/when-to-escalate/data/belief_cache_DRY.json
 
 # Dry-run output is never reportable and must not be committed.
 week1/deliverables/when-to-escalate/results/run_DRY.*
+
+.venv
