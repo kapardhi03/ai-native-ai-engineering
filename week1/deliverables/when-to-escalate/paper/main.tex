@@ -43,13 +43,22 @@ Under Hidden Intent}
 \end{abstract}
 
 % ---------------------------------------------------------------------------
-% Seeded problem statement. Verbatim; the only edit is the LaTeX escaping of
-% the set braces (\{ and \}). Do not reword it.
+% Problem statement. The seeded version named four actions, {answer, ask, hold,
+% escalate}, and this block previously carried a "verbatim, do not reword"
+% instruction. That instruction is deliberately overridden: build decision 25
+% split escalation into escalate_notify and escalate_pause because they carry
+% different costs, so the seeded wording contradicts the action set the results
+% are produced under. The seeded original is preserved in ../build-log.md as
+% decision 0b, marked "Superseded by 25". Keep this statement in agreement with
+% ACTIONS in ../src/costs.py; if the action set changes again, change both.
 % ---------------------------------------------------------------------------
 \noindent\textbf{Problem statement.}
 The agent observes an inbound message from a sales lead. It must
-select one action from \{answer, ask a qualifying question, hold, escalate to a
-human\} because the lead's true intent and buying-readiness are not known.
+select one action from \{answer, ask a qualifying question, hold,
+escalate\_notify, escalate\_pause\} because the lead's true intent and
+buying-readiness are not known. Here \emph{escalate\_notify} alerts a human
+while the conversation continues and \emph{escalate\_pause} stops the agent and
+hands over; the two are separate actions because they carry different costs.
 
 % --- Required section blocks 3-12 -----------------------------------------
 
