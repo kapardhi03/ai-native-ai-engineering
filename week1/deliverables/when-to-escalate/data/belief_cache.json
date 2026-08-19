@@ -1,0 +1,1802 @@
+{
+  "a01-blast-007": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 3,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:37.128478+00:00",
+    "input_hash": "30934dd1f9fdaec9",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-blast-008": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 5,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:38.370732+00:00",
+    "input_hash": "f4e22df467caf83f",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-blast-009": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 4,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:39.411838+00:00",
+    "input_hash": "caadbac1135eb0c4",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-blast-010": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 6,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:40.598202+00:00",
+    "input_hash": "ab40bd151497217e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-001": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:27.007038+00:00",
+    "input_hash": "19bd9e854fa01ca4",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-002": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:28.694779+00:00",
+    "input_hash": "672887d8dd43753e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-003": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:30.645726+00:00",
+    "input_hash": "f6dd8349c654472f",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-004": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:32.455845+00:00",
+    "input_hash": "68f4c6f0982370b7",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-005": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:34.214167+00:00",
+    "input_hash": "230bbee22706eea8",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a01-first-006": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:35.491900+00:00",
+    "input_hash": "80f1e586bc9abfd9",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-deep-015": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 9
+    },
+    "generated_at": "2026-08-19T18:37:47.196797+00:00",
+    "input_hash": "8befe6dd54a9eebd",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-deep-016": {
+    "belief": {
+      "needs_human": 0.8,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 12
+    },
+    "generated_at": "2026-08-19T18:37:48.556745+00:00",
+    "input_hash": "ab2347f92e190983",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-deep-017": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.1,
+        "hot": 0.4,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 11
+    },
+    "generated_at": "2026-08-19T18:37:49.716896+00:00",
+    "input_hash": "7a9905acf36d0818",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-deep-018": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.1,
+        "hot": 0.4,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 14
+    },
+    "generated_at": "2026-08-19T18:37:50.840007+00:00",
+    "input_hash": "6f8d74dd1b7684a3",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-early-011": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:37:41.658961+00:00",
+    "input_hash": "9e5c267075ea3965",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-early-012": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:37:42.861798+00:00",
+    "input_hash": "b5db4242bf52a69e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-early-013": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:37:44.330085+00:00",
+    "input_hash": "958c409934e552c1",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a02-early-014": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:37:45.893786+00:00",
+    "input_hash": "2a67dc879da7b7ee",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-first-019": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:51.981982+00:00",
+    "input_hash": "c16da29246af665f",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-first-020": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:53.569226+00:00",
+    "input_hash": "a365d6f73b9bf4d6",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-first-021": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:54.862792+00:00",
+    "input_hash": "eaddb9ce059f9e71",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-first-022": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 0
+    },
+    "generated_at": "2026-08-19T18:37:56.135648+00:00",
+    "input_hash": "045130f4e206889d",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-followup-023": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 7
+    },
+    "generated_at": "2026-08-19T18:37:57.334488+00:00",
+    "input_hash": "6a3dd1e6bf7d27cf",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-followup-024": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 9
+    },
+    "generated_at": "2026-08-19T18:37:59.005042+00:00",
+    "input_hash": "544ef87786b748a1",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-followup-025": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:00.225173+00:00",
+    "input_hash": "8d80559307fc6c87",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a03-followup-026": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 11
+    },
+    "generated_at": "2026-08-19T18:38:01.672226+00:00",
+    "input_hash": "78ffd8606460e454",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-027": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:02.937229+00:00",
+    "input_hash": "d529597d31d3c681",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-028": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:04.179389+00:00",
+    "input_hash": "63fd4d6b1be8ad15",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-029": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:05.358082+00:00",
+    "input_hash": "af646e7102a497f3",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-030": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.30000000000000004,
+        "warm": 0.6000000000000001
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:06.492887+00:00",
+    "input_hash": "a9e4355fd318f84a",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-031": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:07.648643+00:00",
+    "input_hash": "47ebb4da74e96bea",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-032": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:08.819691+00:00",
+    "input_hash": "3023d6fb6f801186",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-033": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.1,
+        "hot": 0.4,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:10.518332+00:00",
+    "input_hash": "66fa4fc638267793",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-answerable-034": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:11.655540+00:00",
+    "input_hash": "008e04cb2ed887ea",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-035": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:12.800017+00:00",
+    "input_hash": "a607322d48e29ced",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-036": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:14.061892+00:00",
+    "input_hash": "ab12cf8f38ce859c",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-037": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:15.394175+00:00",
+    "input_hash": "1ada17e5f2c5c74f",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-038": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:17.228122+00:00",
+    "input_hash": "7e22e5756cd808c8",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-039": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:19.116567+00:00",
+    "input_hash": "5a5b58844775437b",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-040": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:20.137387+00:00",
+    "input_hash": "45ba3be3cae29ed8",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-041": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:22.038449+00:00",
+    "input_hash": "896fc59970adabf5",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a04-booking-042": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.0,
+        "hot": 0.8,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:23.780637+00:00",
+    "input_hash": "05282411acef6017",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-public-051": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:36.246498+00:00",
+    "input_hash": "0ebc996aba552ea8",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-public-052": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:37.449391+00:00",
+    "input_hash": "55c009f5b73d9f92",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-public-053": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:38.586803+00:00",
+    "input_hash": "0884a2cc9ab7978b",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-public-054": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:39.854043+00:00",
+    "input_hash": "2d36b13483217fe2",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-043": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:25.014215+00:00",
+    "input_hash": "8305851583c5ce70",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-044": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:26.605993+00:00",
+    "input_hash": "77b4ac771fb1ad3c",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-045": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:28.363144+00:00",
+    "input_hash": "fd46aff32e163198",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-046": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:30.293604+00:00",
+    "input_hash": "ec3db6eea1304a0e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-047": {
+    "belief": {
+      "needs_human": 0.8,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:31.448035+00:00",
+    "input_hash": "8bb7a88bf10436f3",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-048": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:32.572076+00:00",
+    "input_hash": "74ca5c5d16c9a29a",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-049": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:33.875758+00:00",
+    "input_hash": "e5ee171e799adc25",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a05-restricted-050": {
+    "belief": {
+      "needs_human": 0.8,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:35.032023+00:00",
+    "input_hash": "71d798eb69ab046d",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-055": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:41.076686+00:00",
+    "input_hash": "54ef94f7e52a7501",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-056": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:42.570501+00:00",
+    "input_hash": "5e29324186d7f49d",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-057": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:43.849640+00:00",
+    "input_hash": "8e1c684f63f02f94",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-058": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:45.076655+00:00",
+    "input_hash": "ac0af0d9f364166b",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-059": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:46.329294+00:00",
+    "input_hash": "0888d40ca6eebc41",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-frustrated-060": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:38:47.520916+00:00",
+    "input_hash": "63b739cc0baa6735",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-mild-061": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:48.515071+00:00",
+    "input_hash": "a26c437cc0f6fad1",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a06-mild-062": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 2
+    },
+    "generated_at": "2026-08-19T18:38:49.654679+00:00",
+    "input_hash": "7d2d956ca65ce7c7",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-internals-067": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:38:55.334653+00:00",
+    "input_hash": "04f4ef0b03593686",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-internals-068": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:38:56.509533+00:00",
+    "input_hash": "079540ad34b2a5b5",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-internals-069": {
+    "belief": {
+      "needs_human": 0.8,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:38:57.716465+00:00",
+    "input_hash": "c0dca4e1782ae64d",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-internals-070": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:38:58.820590+00:00",
+    "input_hash": "ad43999b79bd9118",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-price-063": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.1,
+        "hot": 0.4,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:50.657014+00:00",
+    "input_hash": "952aa6be5e481722",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-price-064": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:51.781448+00:00",
+    "input_hash": "73ac5f67a72993c0",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-price-065": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:52.959422+00:00",
+    "input_hash": "6f22a566c2d396b5",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a07-price-066": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.3,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:38:54.190107+00:00",
+    "input_hash": "b4da63930204fe18",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-reaction-075": {
+    "belief": {
+      "needs_human": 0.0,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 4
+    },
+    "generated_at": "2026-08-19T18:39:05.235422+00:00",
+    "input_hash": "d5ecd8b0f3e75355",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-reaction-076": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 4
+    },
+    "generated_at": "2026-08-19T18:39:06.658490+00:00",
+    "input_hash": "01167f4017464830",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-reaction-077": {
+    "belief": {
+      "needs_human": 0.0,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 4
+    },
+    "generated_at": "2026-08-19T18:39:07.733823+00:00",
+    "input_hash": "11a6690b703fc783",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-reaction-078": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 4
+    },
+    "generated_at": "2026-08-19T18:39:08.975812+00:00",
+    "input_hash": "5661ba8852ca7283",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-voice-071": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:39:00.195870+00:00",
+    "input_hash": "c14994a7d768c7dc",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-voice-072": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:39:01.457413+00:00",
+    "input_hash": "bbd2d6a241530b72",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-voice-073": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:39:02.608481+00:00",
+    "input_hash": "0182e91485c97fdf",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a08-voice-074": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:39:03.916341+00:00",
+    "input_hash": "9e49ecb8abe2095e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-079": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:10.132449+00:00",
+    "input_hash": "ae5ad99ff1450fdf",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-080": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:11.255869+00:00",
+    "input_hash": "26b6add5635a69bc",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-081": {
+    "belief": {
+      "needs_human": 0.7,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:12.441603+00:00",
+    "input_hash": "dde833448717ee00",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-082": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:13.724783+00:00",
+    "input_hash": "ddab2e4a44ba8c20",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-083": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.2,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:14.930433+00:00",
+    "input_hash": "455b9baac16b3663",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a09-oversharer-084": {
+    "belief": {
+      "needs_human": 0.8,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.6000000000000001,
+        "warm": 0.30000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 1
+    },
+    "generated_at": "2026-08-19T18:39:16.182730+00:00",
+    "input_hash": "86956803865bafd1",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-085": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 1,
+      "turn_index": 3
+    },
+    "generated_at": "2026-08-19T18:39:17.362713+00:00",
+    "input_hash": "28d885431b8bc88a",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-086": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 2,
+      "turn_index": 5
+    },
+    "generated_at": "2026-08-19T18:39:18.479868+00:00",
+    "input_hash": "7673f42b33928406",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-087": {
+    "belief": {
+      "needs_human": 0.4,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 4
+    },
+    "generated_at": "2026-08-19T18:39:19.691508+00:00",
+    "input_hash": "82c694d710d3d66e",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-088": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 1,
+      "turn_index": 6
+    },
+    "generated_at": "2026-08-19T18:39:20.952324+00:00",
+    "input_hash": "c07f3303aa101b3c",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-089": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 2,
+      "turn_index": 7
+    },
+    "generated_at": "2026-08-19T18:39:22.023248+00:00",
+    "input_hash": "0bfe68c9cf0750b5",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-early-090": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.2,
+        "hot": 0.1,
+        "warm": 0.7
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 5
+    },
+    "generated_at": "2026-08-19T18:39:23.167459+00:00",
+    "input_hash": "6414b6f7ecbfd77d",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-persistent-091": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 3,
+      "turn_index": 14
+    },
+    "generated_at": "2026-08-19T18:39:24.395116+00:00",
+    "input_hash": "61de030b24ef3c6a",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-persistent-092": {
+    "belief": {
+      "needs_human": 0.9,
+      "readiness": {
+        "cold": 0.10000000000000002,
+        "hot": 0.7000000000000001,
+        "warm": 0.20000000000000004
+      }
+    },
+    "context": {
+      "repeat_count": 8,
+      "turn_index": 18
+    },
+    "generated_at": "2026-08-19T18:39:25.475543+00:00",
+    "input_hash": "3ff28d92cb836ef1",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-persistent-093": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 12
+    },
+    "generated_at": "2026-08-19T18:39:26.603678+00:00",
+    "input_hash": "cf056b7e863c51cf",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a10-persistent-094": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.6,
+        "hot": 0.1,
+        "warm": 0.3
+      }
+    },
+    "context": {
+      "repeat_count": 5,
+      "turn_index": 16
+    },
+    "generated_at": "2026-08-19T18:39:27.888880+00:00",
+    "input_hash": "565e3ae5a627fefe",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-first-095": {
+    "belief": {
+      "needs_human": 0.0,
+      "readiness": {
+        "cold": 0.9,
+        "hot": 0.0,
+        "warm": 0.1
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 5
+    },
+    "generated_at": "2026-08-19T18:39:28.920449+00:00",
+    "input_hash": "ef97b768a633d185",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-first-096": {
+    "belief": {
+      "needs_human": 0.2,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.1,
+        "warm": 0.6
+      }
+    },
+    "context": {
+      "repeat_count": 0,
+      "turn_index": 5
+    },
+    "generated_at": "2026-08-19T18:39:29.940368+00:00",
+    "input_hash": "6c5b7116e31fa641",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-repeated-097": {
+    "belief": {
+      "needs_human": 0.0,
+      "readiness": {
+        "cold": 1.0,
+        "hot": 0.0,
+        "warm": 0.0
+      }
+    },
+    "context": {
+      "repeat_count": 3,
+      "turn_index": 9
+    },
+    "generated_at": "2026-08-19T18:39:31.075782+00:00",
+    "input_hash": "286275ccf080d536",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-repeated-098": {
+    "belief": {
+      "needs_human": 0.3,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 4,
+      "turn_index": 11
+    },
+    "generated_at": "2026-08-19T18:39:32.180452+00:00",
+    "input_hash": "a1cf179c2cd76631",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-repeated-099": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.3,
+        "hot": 0.2,
+        "warm": 0.5
+      }
+    },
+    "context": {
+      "repeat_count": 2,
+      "turn_index": 13
+    },
+    "generated_at": "2026-08-19T18:39:33.354166+00:00",
+    "input_hash": "7c0cf46cf38c7e21",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  },
+  "a11-repeated-100": {
+    "belief": {
+      "needs_human": 0.1,
+      "readiness": {
+        "cold": 0.7,
+        "hot": 0.1,
+        "warm": 0.2
+      }
+    },
+    "context": {
+      "repeat_count": 5,
+      "turn_index": 15
+    },
+    "generated_at": "2026-08-19T18:39:34.496567+00:00",
+    "input_hash": "164dfd889d2a1d14",
+    "model": "gpt-4o-mini",
+    "provider": "openai"
+  }
+}

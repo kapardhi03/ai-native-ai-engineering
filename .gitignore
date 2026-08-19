@@ -12,7 +12,6 @@ __pycache__/
 
 # Generated belief cache is run output, not source.
 # Comment this out if the exact cache behind the reported numbers should ship.
-week1/deliverables/when-to-escalate/data/belief_cache.json
 week1/deliverables/when-to-escalate/data/belief_cache_DRY.json
 
 # Dry-run output is never reportable and must not be committed.
