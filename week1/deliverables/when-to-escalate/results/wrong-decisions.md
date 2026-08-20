@@ -28,7 +28,8 @@ The 16 misses do not all cost the same:
 
 `hold` is a partial hedge: it is wrong, but it does not deliver a wrong answer,
 so the matrix charges 3 or 4 rather than 10. Treating every miss as a cost-10
-event overstates the total by 24.
+event overstates the total by 46. The 24 is what those seven `hold` misses
+actually cost; at 10 each they would have cost 70.
 
 ## The common failure mode
 
