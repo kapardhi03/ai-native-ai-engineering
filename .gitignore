@@ -23,3 +23,6 @@ week1/deliverables/when-to-escalate/results/run_DRY.*
 *.pdf
 *.aux
 *.log
+
+# macOS Finder metadata. Never source, and easy to sweep in with `git add -A`.
+.DS_Store
