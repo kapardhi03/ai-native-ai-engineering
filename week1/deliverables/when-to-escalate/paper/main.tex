@@ -45,11 +45,28 @@ Under Hidden Intent}
 % ---------------------------------------------------------------------------
 % Seeded problem statement. Verbatim; the only edit is the LaTeX escaping of
 % the set braces (\{ and \}). Do not reword it.
+%
+% The seed names four actions. Build decision 25 split escalation into
+% escalate_notify and escalate_pause because the two carry different costs, so
+% every result in ../results/ is produced under a five-action set. That gap is
+% closed by the note below, NOT by editing the statement above it. Keep the note
+% in agreement with ACTIONS in ../src/costs.py.
 % ---------------------------------------------------------------------------
 \noindent\textbf{Problem statement.}
 The agent observes an inbound message from a sales lead. It must
 select one action from \{answer, ask a qualifying question, hold, escalate to a
 human\} because the lead's true intent and buying-readiness are not known.
+
+\medskip
+\noindent\textit{Note on the action set.}
+The statement above is the original problem seed, reproduced verbatim. In the
+course of this work escalation was split into two distinct actions:
+\emph{escalate\_notify}, where a human is alerted while the conversation
+continues, and \emph{escalate\_pause}, where the agent stops and hands over. The
+two are separated because they carry materially different costs, and collapsing
+them would hide that difference from the decision rule. The resulting
+five-action set --- \{answer, ask, hold, escalate\_notify, escalate\_pause\} ---
+is the one used throughout this paper and in every reported result.
 
 % --- Required section blocks 3-12 -----------------------------------------
 
