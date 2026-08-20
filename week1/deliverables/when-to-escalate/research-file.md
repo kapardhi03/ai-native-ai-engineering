@@ -3,14 +3,18 @@
 ## Problem statement
 
 The agent observes an inbound message from a sales lead. It must
-select one action from {answer, ask a qualifying question, hold, escalate to a
-human} because the lead's true intent and buying-readiness are not known.
+select one action from {`answer`, `ask`, `hold`, `escalate_notify`,
+`escalate_pause`} because the lead's true intent and buying-readiness are not
+known. `ask` is a qualifying question rather than an answer; `escalate_notify`
+tells a human while the conversation continues; `escalate_pause` stops the agent
+and hands over. The two escalations are separate actions because they carry
+different costs (build decision 25, superseding the original four-action set).
 
 ---
 
 ## Project objective
 
-Design and test a decision policy for a conversational sales agent that must choose, on each inbound message, whether to answer, ask a qualifying question, hold, or escalate to a human, when the lead's true intent and buying-readiness cannot be observed. The agent maintains an explicit belief over that hidden state and selects the action with the lowest expected cost, where the costs reflect real business damage rather than what is easy to detect. The goal is to compare this cost-aware policy against a baseline and show where reasoning about the cost of each mistake changes the decision.
+Design and test a decision policy for a conversational sales agent that must choose, on each inbound message, whether to answer, ask a qualifying question, hold, notify a human while the conversation continues, or pause and hand over to a human, when the lead's true intent and buying-readiness cannot be observed. The agent maintains an explicit belief over that hidden state and selects the action with the lowest expected cost, where the costs reflect real business damage rather than what is easy to detect. The goal is to compare this cost-aware policy against a baseline and show where reasoning about the cost of each mistake changes the decision.
 
 ## Technical terms
 
