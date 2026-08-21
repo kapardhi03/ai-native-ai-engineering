@@ -230,7 +230,7 @@ def test_describe_marks_missing_keys_and_blocked_fallback(config, monkeypatch):
 # Path resolution — the bug that would silently split the cache in two
 # --------------------------------------------------------------------------- #
 
-REL = "week1/deliverables/when-to-escalate/data/belief_cache.json"
+REL = "week1/when-to-escalate/data/belief_cache.json"
 
 
 def test_relative_path_is_independent_of_cwd(config, monkeypatch, tmp_path):

@@ -30,7 +30,7 @@ jobs:
       # stubs both SDKs and asserts that no test reaches the network. A test that
       # started making real calls would fail here rather than quietly bill someone.
       - name: Run tests
-        run: python -m pytest week1/deliverables/when-to-escalate
+        run: python -m pytest week1/when-to-escalate
 
       - name: Offline smoke test
-        run: python week1/deliverables/when-to-escalate/src/belief.py
+        run: python week1/when-to-escalate/src/belief.py

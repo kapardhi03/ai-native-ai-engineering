@@ -94,7 +94,7 @@ def test_working_directory_does_not_change_where_beliefs_land(
         belief, config, make_settings, fake_openai, tmp_path, monkeypatch):
     """The regression that would silently split the cache in two."""
     fake_openai({"hot": .5, "warm": .3, "cold": .2, "needs_human": .1})
-    rel = "week1/deliverables/when-to-escalate/data/_test_cache.json"
+    rel = "week1/when-to-escalate/data/_test_cache.json"
     monkeypatch.setenv("BELIEF_CACHE_PATH", rel)
     monkeypatch.setenv("BELIEF_PROVIDER", "openai")
     monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
