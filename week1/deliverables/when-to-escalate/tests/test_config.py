@@ -349,3 +349,63 @@ def test_missing_env_file_is_not_fatal(config, monkeypatch, tmp_path):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
     monkeypatch.setattr(config, "_env_candidates", lambda: [tmp_path / "absent"])
     assert config.load_settings(reload=True).env_files == ()
+
+
+# --------------------------------------------------------------------------- #
+# Cache-only mode — reproducing the reported run without a key
+# --------------------------------------------------------------------------- #
+#
+# The bug this closes: the committed cache covers every case, so re-running the
+# experiment needs no network call, but validation demanded a live provider before
+# the cache was ever consulted. A fresh clone could not reproduce the paper's
+# numbers without a key it would never actually use.
+
+def test_cache_only_lifts_the_keyless_strict_block(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_CACHE_ONLY", "true")
+    s = config.load_settings(reload=True, load_env_files=False)
+    assert s.cache_only is True
+    assert s.allow_rule_fallback is False, "cache-only must not relax strictness"
+    assert s.live_providers == ()
+
+
+def test_keyless_strict_still_fails_without_cache_only(config):
+    """The guard must not have been weakened for everyone."""
+    with pytest.raises(config.ConfigError):
+        config.load_settings(reload=True, load_env_files=False)
+
+
+def test_cache_only_error_message_names_the_escape_hatch(config):
+    with pytest.raises(config.ConfigError, match="BELIEF_CACHE_ONLY"):
+        config.load_settings(reload=True, load_env_files=False)
+
+
+def test_cache_only_contradicts_the_rule_fallback(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_CACHE_ONLY", "true")
+    monkeypatch.setenv("BELIEF_ALLOW_RULE_FALLBACK", "true")
+    with pytest.raises(config.ConfigError, match="contradicts"):
+        config.load_settings(reload=True, load_env_files=False)
+
+
+def test_cache_only_does_not_require_a_named_providers_key(config, monkeypatch):
+    """provider=openai normally demands OPENAI_API_KEY. Cache-only generates
+    nothing, so the key is genuinely unnecessary."""
+    monkeypatch.setenv("BELIEF_PROVIDER", "openai")
+    monkeypatch.setenv("BELIEF_CACHE_ONLY", "true")
+    s = config.load_settings(reload=True, load_env_files=False)
+    assert s.provider == "openai" and s.cache_only is True
+
+    monkeypatch.delenv("BELIEF_CACHE_ONLY")
+    with pytest.raises(config.ConfigError):
+        config.load_settings(reload=True, load_env_files=False)
+
+
+def test_cache_only_defaults_off(config, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
+    assert config.load_settings(
+        reload=True, load_env_files=False).cache_only is False
+
+
+def test_cache_only_is_shown_in_describe(config, monkeypatch):
+    monkeypatch.setenv("BELIEF_CACHE_ONLY", "true")
+    text = config.load_settings(reload=True, load_env_files=False).describe()
+    assert "cache only" in text and "no LLM call" in text

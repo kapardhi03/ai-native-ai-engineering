@@ -11,6 +11,20 @@ for all 100 cases under both policies, so the numbers below are the ones the
 policy actually compared. No constraint was active on any of these five
 (`constraints: []`), so the feasible set was all five actions in every case.
 
+## Corrections
+
+This file is a record of what the run analysis found, so corrections are added
+rather than applied silently — the same rule `build-log.md` uses for superseded
+decisions. Original wording is kept, struck through, so the file still shows what
+was believed when the run was analysed.
+
+| # | Date | Where | What changed |
+| --- | --- | --- | --- |
+| C1 | 2026-08-21 | "Where the threshold sits", second bullet | The `hold`-vs-`notify` flip range was given as "0.31 to 0.38". Two cases are not the band, and the upper end was overstated. Corrected to the measured per-case range. |
+| C2 | 2026-08-21 | "Which of the five costs most", closing paragraph | The `a11-repeated-097` tie-break was written as a live defect. It has since been fixed; the case is retained because the reported run predates the fix. |
+| C3 | 2026-08-21 | "The common failure mode", closing paragraph | **Retraction.** The misses were claimed as evidence *for* the independence of locked design 0a. The run records only the two marginals, never the joint, so it cannot be evidence either way. |
+| C4 | 2026-08-21 | "3. Just below the threshold" | `a02-deep-015` was described as missing the threshold by 0.031. The arithmetic stands, but the belief is quantized to one decimal, so the gap is a full step of its granularity, not three hundredths. |
+
 ## The population these five come from
 
 The cost-aware policy missed 16 escalations over 100 cases — 16 cases where the
@@ -43,9 +57,18 @@ This is finding **F4** in `build-log.md`. All 16 misses share an under-estimated
 
 So the misses are not cases where the model confused "how ready is this lead"
 with "does this need a human". They are cases where one marginal — the
-`needs_human` probability — was systematically too low. This is evidence *for*
+`needs_human` probability — was systematically too low. ~~This is evidence *for*
 the independence assumed in locked design 0a, not against it: the failing
-quantity is a single miscalibrated marginal, and the other marginal is often fine.
+quantity is a single miscalibrated marginal, and the other marginal is often fine.~~
+
+**Corrected C3 (2026-08-21) — retracted.** That the misses localise to one marginal
+is *consistent with* the independence assumed in locked design 0a, but it is not
+evidence **for** it. This experiment records only the two marginals and never the
+joint, so it cannot detect the two components interfering even if they did — a
+localised miscalibration and a genuine dependence are not distinguishable from what
+was logged. Testing the assumption would need `P(s, h)` elicited directly and
+compared against `P(s)·P(h)`, which this run does not do. Locked design 0a remains
+a modelling assumption, not a measured fact. The paper states the same retraction.
 
 The `needs_human` reliability bins in the same run agree: predicted 0.10 against
 observed 0.40 in the 0.1–0.2 bin, and predicted 0.30 against observed 0.588 in
@@ -65,7 +88,21 @@ Two different comparisons set it:
   depend on the readiness distribution at all.
 - When the policy chose `hold`, the binding comparison is `hold` against
   `escalate_notify`, and the `hold` row is *not* flat across readiness, so the
-  flip point moves with the belief — 0.31 to 0.38 in the cases below.
+  flip point moves with the belief — ~~0.31 to 0.38 in the cases below~~.
+
+  **Corrected C1 (2026-08-21).** Two of these five cases chose `hold`, and they
+  flip at **0.3051** (`a10-persistent-091`, = 1.8/5.9) and **0.3729**
+  (`a03-followup-024`, = 2.2/5.9), so the upper end above was overstated by 0.007.
+  *Note:* the case table for `a10-persistent-091` below, and the paper, both round
+  the first of these to 0.306; at three decimals it is 0.305. Left as found rather
+  than corrected here, since it is also in the paper. The larger problem is that two
+  cases are not a band. Solving `E[notify] = E[hold]` against each of the 100
+  recorded readiness distributions puts the flip point inside `[0, 1]` on **73**
+  cases, spanning **`[0.018, 0.500]`**; on the remaining **27** it is negative,
+  meaning `escalate_notify` already beats `hold` at every `needs_human` value and no
+  threshold exists. Pure readiness states give −0.600 (`hot`), 0.333 (`warm`) and
+  0.500 (`cold`). Recomputed from the `belief` and `cost_matrix` blocks of
+  `run.json`; the paper's threshold section reports the same range.
 
 ## The five
 
@@ -124,13 +161,22 @@ small calibration correction reaches it.
 | chose | `answer`, margin **0.400** |
 | correct action | `escalate_notify` (cell `warm\|True` = 0) |
 | cost incurred | **10** — cell `answer[warm\|True]` |
-| flip point | `needs_human` ≥ 0.231 (belief was 0.20, short by **0.031**) |
+| flip point | `needs_human` ≥ 0.231 (belief was 0.20 — 0.031 below, but one full quantization step; see C4) |
 
-The narrowest miss in the set: the belief was 0.031 below the threshold. Worth
+~~The narrowest miss in the set: the belief was 0.031 below the threshold.~~ Worth
 reading against `a02-deep-018`, the same archetype and variant, where the belief
 put `needs_human` at 0.30, the policy escalated, and the cost was 0. Two cases
 from one archetype straddle `3/13`, and a 0.10 difference in one marginal is the
 whole distance between a cost of 0 and a cost of 10.
+
+**Corrected C4 (2026-08-21).** The number stands — `3/13 − 0.20 = 0.0308` — but
+reading it as a near miss overstates how close the call was. Every one of the 100
+elicited `needs_human` values sits at one decimal place (`{0.0: 4, 0.1: 15,
+0.2: 35, 0.3: 17, 0.4: 6, 0.7: 6, 0.8: 5, 0.9: 12}`), so the belief cannot express
+0.231, or anything at all between 0.20 and 0.30. Recovering this case means moving
+it a full step of the belief's granularity, not nudging it by three hundredths —
+and the same is true of the other 34 cases pinned at 0.20. It is still the
+narrowest miss in the set; the margin is one quantization step, not 0.031.
 
 ### 4. `hold` as a hedge, on a lead misread as cold
 
@@ -186,7 +232,8 @@ is the cost number:
 
 1. Its belief is furthest from the flip point. It needed `needs_human` above 0.50
    to escalate and reported 0.00 — a gap of over 0.50, against 0.131 for
-   `a04-booking-042` and 0.031 for `a02-deep-015`. Recalibrating the marginal
+   `a04-booking-042` and 0.031 for `a02-deep-015` (both of which are still a whole
+   quantization step or more from the line, per C4). Recalibrating the marginal
    fixes the other two and does not fix this one.
 2. It was not decided by the cost model at all. The margin is 0.000; `answer` and
    `hold` had identical expected cost and the `ACTIONS` ordering picked between
@@ -197,8 +244,32 @@ is the cost number:
 The distinction matters for what each failure implies. `a02-deep-015` and
 `a04-booking-042` are calibration errors and argue for improving the
 `needs_human` estimate. `a11-repeated-097` argues for something else: a belief
-that returns 0.00 for a marginal it cannot actually rule out, and a tie-break
-that resolves toward the highest-cost action rather than the lowest.
+that returns 0.00 for a marginal it cannot actually rule out, and ~~a tie-break
+that resolves toward the highest-cost action rather than the lowest~~.
+
+**Corrected C2 (2026-08-21).** The tie-break is no longer an open defect. The
+cause recorded above is the diagnosis that fixed it: the margin was 0.000, so
+`answer` and `hold` had identical expected cost and the decision fell to the
+declaration order of `ACTIONS`, which puts `answer` — the largest worst-case cost
+in the matrix — first. Ties are now resolved safest-first by worst-case cost, in an
+order derived from the matrix rather than hand-written (`tie_break_order` in
+`src/costs.py`), giving `escalate_notify` (3) < `ask` (4) < `escalate_pause` (6) <
+`hold` (8) < `answer` (10).
+
+`a11-repeated-097` is retained in this file, at its recorded cost of 10, because
+the reported run predates the fix. `results/run.json` was generated under the old
+order and is kept as the artifact the paper's numbers are checked against;
+`run_policies.py --legacy-tie-break` reproduces it action for action. Under the
+corrected default this case moves from `answer` to `hold`, its realised cost falls
+from 10 to 3, and the run's mean cost falls from 1.72 to 1.65. It is the only
+decision that changes — and the only one that *could*, since it is the one case in
+the 100 where two feasible actions tie at exactly equal expected cost. It remains a
+missed escalation either way, since `hold` does not escalate, so the miss count
+stays at 16.
+
+The first half of the sentence above still stands: a belief that returns 0.00 for
+a marginal it cannot rule out is untouched by this fix, and is why recalibration
+does not recover this case either.
 
 ## Cost-matrix cells charged
 

@@ -294,3 +294,68 @@ def test_describe_matrix_renders_every_action(costs):
     text = costs.describe_matrix()
     for action in costs.ACTIONS:
         assert action in text
+
+
+# --------------------------------------------------------------------------- #
+# Tie-breaking — an exact tie must not be resolved by asserting
+# --------------------------------------------------------------------------- #
+
+def test_tie_break_order_is_derived_from_worst_case_cost(costs):
+    """Not hand-written. Same reason UNIFORM_COST is derived: a hardcoded order
+    could drift away from the matrix it is supposed to reflect."""
+    order = costs.tie_break_order()
+    assert order == ("escalate_notify", "ask", "escalate_pause", "hold", "answer")
+    worst = [max(costs.COST[a].values()) for a in order]
+    assert worst == sorted(worst), "order must be non-decreasing in worst-case cost"
+
+
+def test_tie_break_order_follows_a_changed_matrix(costs):
+    """If `answer` stops being the riskiest action, it stops being last."""
+    matrix = {a: dict(row) for a, row in costs.COST.items()}
+    for state in matrix["answer"]:
+        matrix["answer"][state] = 0.0
+    assert costs.tie_break_order(matrix)[0] == "answer"
+
+
+def test_exact_tie_resolves_to_the_safer_action(costs, belief):
+    """b_h=0 on a cold lead ties `answer` and `hold` at 0.000. The safe rule must
+    pick `hold`; the legacy rule picked `answer`, the action with the worst
+    downside. This is the a11-repeated-097 case from the paper's failure analysis.
+    """
+    b = mk(belief, hot=0.0, warm=0.0, cold=1.0, needs_human=0.0)
+    costs_by_action = {a: costs.expected_cost(a, b) for a in costs.ACTIONS}
+    assert math.isclose(costs_by_action["answer"], costs_by_action["hold"]), \
+        "fixture no longer produces a tie; the rest of this test proves nothing"
+
+    assert costs.choose_action(b).action == "hold"
+    assert costs.choose_action(b, legacy_tie_break=True).action == "answer"
+
+
+def test_tie_break_never_changes_a_strict_winner(costs, belief):
+    """The tie-break must only touch exact ties. Swept over the simplex: wherever
+    the two rules disagree, the chosen actions must have had equal expected cost.
+    """
+    for hot in range(0, 11):
+        for warm in range(0, 11 - hot):
+            cold = 10 - hot - warm
+            for nh in (0, .1, .2, .25, .3, .5, .7, 1.0):
+                b = mk(belief, hot=hot / 10, warm=warm / 10, cold=cold / 10,
+                       needs_human=nh)
+                safe = costs.choose_action(b)
+                legacy = costs.choose_action(b, legacy_tie_break=True)
+                if safe.action != legacy.action:
+                    assert math.isclose(
+                        safe.expected_costs[safe.action],
+                        legacy.expected_costs[legacy.action]), (
+                        f"tie-break changed a strict winner at "
+                        f"({hot},{warm},{cold},{nh})")
+
+
+def test_safe_tie_break_never_costs_more_in_the_worst_case(costs, belief):
+    """The property that justifies the change, stated directly."""
+    for nh in (0.0, 0.25, 0.5):
+        b = mk(belief, hot=1/3, warm=1/3, cold=1/3, needs_human=nh)
+        safe = costs.choose_action(b).action
+        legacy = costs.choose_action(b, legacy_tie_break=True).action
+        assert (max(costs.COST[safe].values())
+                <= max(costs.COST[legacy].values()))

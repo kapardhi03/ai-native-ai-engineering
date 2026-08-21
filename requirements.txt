@@ -3,8 +3,16 @@ python-dotenv>=1.0.0
 
 # Belief providers. Both optional: the rule-based fallback needs neither, but a
 # real run does (BELIEF_ALLOW_RULE_FALLBACK=false requires at least one).
+# Neither is needed to reproduce the reported numbers: BELIEF_CACHE_ONLY=true
+# serves every belief from the committed cache and makes no network call.
 openai>=1.0.0
 google-genai>=1.0.0
+
+# Figures. Needed only by paper/figures/make_figures.py, which renders the
+# reliability diagram main.tex includes. Was missing, so a fresh clone could not
+# regenerate the figure; `make_figures.py --check` prints the same numbers
+# without it.
+matplotlib>=3.7.0
 
 # Tests
 pytest>=8.0.0

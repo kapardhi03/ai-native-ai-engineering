@@ -63,6 +63,15 @@ DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
 DEFAULT_GOOGLE_MODEL = "gemini-2.0-flash"
 DEFAULT_CACHE_PATH = "week1/deliverables/when-to-escalate/data/belief_cache.json"
 
+# Reproduction mode. The committed cache covers every case in data/cases.json, so
+# re-running the reported experiment needs no API key and makes no network call --
+# but validation below used to demand a live provider before the cache was ever
+# consulted, so a fresh clone could not reproduce the paper's numbers without a
+# key it never actually used. BELIEF_CACHE_ONLY=true says "serve from the cache
+# and fail loudly on a miss". It is stricter than the fallback, not looser: a miss
+# is an error rather than a quietly-different belief.
+DEFAULT_CACHE_ONLY = False
+
 _TRUE_TOKENS = frozenset({"1", "true", "t", "yes", "y", "on"})
 _FALSE_TOKENS = frozenset({"0", "false", "f", "no", "n", "off"})
 
@@ -191,6 +200,7 @@ class Settings:
     cache_path: Path               # absolute
     openai_api_key: Optional[str]
     google_api_key: Optional[str]
+    cache_only: bool = False       # serve from cache; a miss is an error
     env_files: tuple[Path, ...] = ()
 
     # -- secrets never appear in logs or tracebacks -------------------------- #
@@ -202,6 +212,7 @@ class Settings:
             f"openai_model={self.openai_model!r}, "
             f"google_model={self.google_model!r}, "
             f"cache_path={str(self.cache_path)!r}, "
+            f"cache_only={self.cache_only}, "
             f"openai_api_key={self._mask(self.openai_api_key)}, "
             f"google_api_key={self._mask(self.google_api_key)})"
         )
@@ -249,6 +260,7 @@ class Settings:
             f"  google model     : {self.google_model} "
             f"({'key set' if self.google_api_key else 'NO KEY'})",
             f"  cache path       : {self.cache_path}",
+            f"  cache only       : {'YES (no LLM call will be made)' if self.cache_only else 'no'}",
         ])
 
     def with_overrides(self, **kwargs) -> "Settings":
@@ -274,18 +286,31 @@ def _validate(settings: Settings) -> Settings:
             "Pick one: allow the fallback, or choose a real LLM provider."
         )
 
-    if settings.provider in ("openai", "google"):
+    if settings.cache_only and settings.allow_rule_fallback:
+        raise ConfigError(
+            "BELIEF_CACHE_ONLY=true contradicts BELIEF_ALLOW_RULE_FALLBACK=true. "
+            "Cache-only means no belief is generated at all, so there is nothing "
+            "for the fallback to do; leaving both on hides which one applied."
+        )
+
+    # A concrete LLM provider needs its key -- unless nothing will be generated.
+    if settings.provider in ("openai", "google") and not settings.cache_only:
         settings.require_key(settings.provider)
 
     # The failure mode worth catching early: a strict run with no way to satisfy
-    # it. Left to fail at call time it would burn the whole run first.
+    # it. Left to fail at call time it would burn the whole run first. Cache-only
+    # runs are exempt: they satisfy every belief from disk and never call out, so
+    # demanding a key here would block the one mode that reproduces the paper
+    # offline.
     if (settings.provider == AUTO_PROVIDER
             and not settings.allow_rule_fallback
+            and not settings.cache_only
             and not settings.live_providers):
         raise ConfigError(
             "BELIEF_ALLOW_RULE_FALLBACK=false requires a real LLM call, but "
             "neither OPENAI_API_KEY nor GOOGLE_API_KEY is set, so no provider "
-            "can produce a belief. Add a key, or allow the fallback."
+            "can produce a belief. Add a key, allow the fallback, or set "
+            "BELIEF_CACHE_ONLY=true to reproduce from the committed cache."
         )
 
     return settings
@@ -319,6 +344,7 @@ def load_settings(*, reload: bool = False, load_env_files: bool = True) -> Setti
         cache_path=_resolve_path(_read_str("BELIEF_CACHE_PATH", DEFAULT_CACHE_PATH)),
         openai_api_key=_read_secret("OPENAI_API_KEY"),
         google_api_key=_read_secret("GEMINI_API_KEY") or _read_secret("GOOGLE_API_KEY"),
+        cache_only=_read_bool("BELIEF_CACHE_ONLY", DEFAULT_CACHE_ONLY),
         env_files=env_files,
     ))
 

@@ -184,25 +184,57 @@ class Decision:
         return (ranked[1] - ranked[0]) if len(ranked) > 1 else float("inf")
 
 
+def tie_break_order(matrix: Optional[dict] = None) -> tuple[str, ...]:
+    """Actions ranked safest-first, for resolving exact ties in expected cost.
+
+    Derived from the matrix by worst-case cost, not hand-written — the same reason
+    UNIFORM_COST is derived. Under the practitioner matrix this gives
+
+        escalate_notify (worst case 3) < ask (4) < escalate_pause (6)
+                                       < hold (8) < answer (10)
+
+    so a tie resolves toward the action whose downside is smallest.
+
+    Why this matters. Ties previously resolved in ACTIONS order, which puts
+    `answer` first — the action with the LARGEST worst case. A tie means the belief
+    has no opinion, and a policy whose whole premise is that a false assertion is
+    the expensive error should not resolve indifference by asserting. On the
+    reported case set exactly one decision turns on this (a11-repeated-097, where
+    `answer` and `hold` tie at 0.000), and it accounts for 7 realised cost points.
+
+    ACTIONS.index is retained as the final key so the result is still a total
+    order, and so two actions with the same worst case resolve deterministically.
+    """
+    matrix = matrix if matrix is not None else COST
+    return tuple(sorted(ACTIONS,
+                        key=lambda a: (max(matrix[a].values()), ACTIONS.index(a))))
+
+
 def choose_action(belief, constraints: Iterable[str] = (),
-                  matrix: Optional[dict] = None) -> Decision:
+                  matrix: Optional[dict] = None,
+                  legacy_tie_break: bool = False) -> Decision:
     """The myopic rule: lowest expected cost among the feasible actions.
 
     Constraints are applied by REMOVING actions before the comparison, never by
     inflating their cost. A forbidden action is not merely a bad deal that a
     confident enough belief could justify — it is not on the menu.
 
-    Ties break in ACTIONS order, which is deterministic and recorded here rather
-    than left to whatever `min` happens to do.
+    Exact ties are broken safest-first via tie_break_order, i.e. by worst-case
+    cost. `legacy_tie_break=True` restores the original ACTIONS-order rule, which
+    resolved ties toward `answer`. It exists so the committed results/run.json
+    stays verifiable; it should not be used for new runs.
     """
     constraints = tuple(constraints)
     available = feasible_actions(constraints)
     removed = tuple(a for a in ACTIONS if a not in available)
 
-    costs = {a: expected_cost(a, belief, matrix) for a in ACTIONS}
-    best = min(available, key=lambda a: (costs[a], ACTIONS.index(a)))
+    order = ACTIONS if legacy_tie_break else tie_break_order(matrix)
+    rank = {a: i for i, a in enumerate(order)}
 
-    unconstrained_best = min(ACTIONS, key=lambda a: (costs[a], ACTIONS.index(a)))
+    costs = {a: expected_cost(a, belief, matrix) for a in ACTIONS}
+    best = min(available, key=lambda a: (costs[a], rank[a]))
+
+    unconstrained_best = min(ACTIONS, key=lambda a: (costs[a], rank[a]))
     constrained = best != unconstrained_best
 
     if constrained:
