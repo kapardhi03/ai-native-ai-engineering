@@ -383,10 +383,10 @@ These are kept separate on purpose. A lead can be ready to buy \emph{and} need
 a human (someone has to confirm a booking), or clearly not ready \emph{and}
 still need a human (an abusive or competitor message a bot should not handle).
 A single confidence score cannot represent either case. Treating readiness and
-needs-human as independent is a modelling assumption, not a measured fact;
-Section~\ref{sec:results} reports evidence that the assumption holds, the
-failures trace to one miscalibrated marginal, not to the two components
-bleeding into each other.
+needs-human as independent is a modelling assumption, not a measured fact, and
+Section~\ref{sec:results} does not validate it: the failures localise to one
+miscalibrated marginal, which is consistent with independence but not evidence for
+it, since the run never observes the joint.
 
 Because the two are independent, the joint probability of any full state
 factors as a product:
@@ -438,10 +438,10 @@ does not apply.}
 The costs are expert-set, not learned. An earlier draft claimed their
 \emph{ordering} was the load-bearing part and not the exact magnitudes; a
 sensitivity sweep supports that for one cell and refutes it for another, so the
-claim is stated more narrowly here. Varying the false-assertion cost from 7 to 30,
-which preserves every ordering, leaves the decisions untouched at 16 misses and 43
-escalations throughout (mean realised cost still drifts, from 1.920 at 7 to 1.580 at
-30, via answer-to-hold substitution on cases that were not misses). The
+claim is stated more narrowly here. Sweeping the false-assertion cost from 7 to 30
+preserves every ordering, yet the decisions shift midway: 16 misses and 43
+escalations from 7 to 10 (cost 1.920 to 1.650), then 14 and 54 from 12 to 30 (1.590
+to 1.520). Ordering-invariance holds locally, not across the range. The
 needless-notify cost is not like that. Sweeping it from 1 to 6, again preserving
 every ordering, moves the policy across almost its whole operating range: 1 miss and
 96 escalations at a cost of 1, 8 and 73 at 2, 16 and 43 at 3, 23 and 28 at 4, and 25
@@ -499,7 +499,7 @@ over the 100 cases, all at one decimal place, and none of them falls in
 $(0.2, 0.3]$. Every threshold in that interval therefore produces identical
 decisions on every case, and $3/13 \approx 0.231$ is one arbitrary point inside a
 band the measurement cannot resolve. Nothing in the results distinguishes it from
-$0.25$. The derivation is exact; what it is applied to is quantized to a tenth.
+$0.25$.
 
 This clean single threshold holds only when the runner-up action is
 \emph{answer}. When \emph{hold} is the competing action its row is not flat
@@ -785,17 +785,14 @@ be counted. Treating every miss as a false assertion at cost 10 overstates the
 damage, because a \emph{hold} is a partial hedge: it is the wrong action, but it
 does not deliver a false answer, so the matrix charges it 3 or 4 rather than 10.
 Across the 16 misses the realised costs are nine at 10, four at 3, and three at 4,
-for 114 in total, not the 160 that costing every miss at 10 would give. The
-analysis reports 114.
+for 114 in total, not the 160 that costing every miss at 10 would give.
 One caveat belongs with this diagnosis. That every miss traces to an
 under-estimated needs-human probability is a statement about this labelling
 scheme, not a proof of the underlying causal mechanism: the experiment does not
 independently exclude cost-model misspecification, the coarse three-state
 readiness space, or the one-decimal quantization of the belief as contributing
 causes, and the recalibration in §7.3 is an in-sample ceiling rather than a
-held-out test. What can be said is the narrower claim the rest of this section
-makes --- the misses localise to one marginal --- not that no other factor
-bears on them.
+held-out test.
 \subsection{Five cases}
 Table~\ref{tab:failures} lists five misses and the mode each one represents.
 
@@ -877,7 +874,8 @@ Since the diagnosis above points at the needs-human marginal, it can be tested
 directly rather than left as a prediction. Replacing each elicited $b_h$ with the
 observed frequency of its reliability bin --- histogram binning, fit on the same
 100 cases, so this is an optimistic in-sample ceiling and not a held-out result ---
-and re-running the policy gives mean cost 1.250 against 1.720, and 8 misses against
+and re-running the policy gives mean cost 1.250 against the corrected baseline of
+1.650, and 8 misses against
 16.
 
 The composition of that change matters more than the totals. Of the 16 original
@@ -887,8 +885,7 @@ frequency (0.171) is itself below the threshold, so recalibration moves them the
 wrong way, and 1 is \texttt{a11-repeated-097} at $b_h = 0.00$. Recalibration also
 \emph{creates} one new miss: \texttt{a06-frustrated-055}, at $b_h = 0.70$, is pulled
 down into the over-confident 0.7--0.8 bin and switches from
-\emph{escalate-notify} to \emph{hold}. So the honest count is 9 fixed, 7 surviving,
-1 created.
+\emph{escalate-notify} to \emph{hold}.
 
 The cost is paid in human load. Escalations rise from 43 to 60, precision falls from
 0.605 to 0.567, and recall rises from 0.619 to 0.810. Recalibration does not make
@@ -959,7 +956,7 @@ error-free, because a flag on the case says the message asks for legal or land
 documents. A production detector for that condition
 would carry its own false-positive and false-negative rates, which this experiment
 does not model. Sweeping a synthetic false-negative rate on that flag from 0 to 0.5
-changes nothing --- cost stays at 1.720 and misses at 16 --- but that is not
+changes nothing --- cost stays at 1.650 and misses at 16 --- but that is not
 reassurance, it is a restatement of the fact that the constraint never bound: on all
 8 restricted cases the policy already escalates on cost grounds, so dropping the flag
 changes no decision. A detector's error rates would matter on restricted cases the
@@ -1041,7 +1038,7 @@ Three questions follow directly from these results.
 
 The first is calibration, and it is the one this version can partly answer.
 Recalibrating the needs-human marginal in-sample halves the misses, from 16 to 8,
-and cuts mean cost from 1.720 to 1.250 --- but the composition is 9 fixed, 7
+and cuts mean cost from 1.650 to 1.250 --- but the composition is 9 fixed, 7
 surviving, and 1 newly created, and escalations rise from 43 to 60 to pay for it.
 The floor is real and it has a specific cause: 6 of the 7 survivors sit at
 $b_h = 0.20$, in a bin whose observed frequency is also below the threshold, so no

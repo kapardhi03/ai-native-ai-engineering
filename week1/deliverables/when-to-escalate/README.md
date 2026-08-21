@@ -66,8 +66,8 @@ Graded deliverables:
 Working files, not graded:
 
 - `build-log.md` — every design decision with its verdict and reason, the open
-  questions, the limitations carried into the paper (L1–L8), and the findings
-  (F1–F7). Rows are never edited after the fact; a reversal is added as a new row
+  questions, the limitations carried into the paper (L1–L9), and the findings
+  (F1–F8). Rows are never edited after the fact; a reversal is added as a new row
   that supersedes the old one.
 - `PLAN.md` — the day-by-day working plan.
 - `tests/` — 337 tests; see step 6.
