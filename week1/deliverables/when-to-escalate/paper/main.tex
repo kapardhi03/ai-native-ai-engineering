@@ -1,36 +1,80 @@
 % ===========================================================================
-% PLACEHOLDER DOCUMENT CLASS
+% IJCAI--ECAI 26 preprint format. Formatted with the official kit; not submitted % to IJCAI and not accepted by IJCAI.
 %
-% `article` is a stand-in so this file compiles today on a plain TeX install
-% with no extra downloads. It is NOT the submission format.
+% ijcai26.sty and named.bst sit next to this file, both copied unmodified from
+% the official author kit (https://www.ijcai.org/authors_kit). ijcai26.sty is a
+% style file, not a class, so the class stays `article` and the style loads on
+% top of it. That is what the kit's own ijcai26.tex does.
 %
-% When the IJCAI author kit is in hand, do all of this in one pass:
-%   1. Replace the \documentclass line below with the class/style the author kit
-%      specifies, and drop the kit's .sty and .bst files next to this file.
-%   2. Add the author/affiliation block in the kit's required form.
-%   3. Delete any package below that the kit already loads or forbids.
-%   4. Swap the References block at the bottom for the kit's bibliography
-%      commands, using the kit's .bst style.
+% The kit is US Letter (8.5in x 11in) and says the letter format matters; the
+% earlier a4paper option is gone. \documentclass takes no font-size option
+% because ijcai26.sty sets every size itself (10pt on 11pt).
+%
 % Do not hand-format anything the kit controls (margins, fonts, headings).
 % ===========================================================================
-\documentclass[11pt,a4paper]{article}
+\documentclass{article}
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
 
-\usepackage[T1]{fontenc}
+\usepackage{ijcai26}
+
+% Package list and order mirror the kit's ijcai26.tex. ijcai26.sty loads no
+% packages of its own, so nothing here double-loads. The two lines marked
+% ADDED are not in the kit; both are safe to delete if they cause trouble.
+\usepackage[T1]{fontenc}   % ADDED. Real underscore glyph for escalate\_notify.
+\usepackage{times}
+\usepackage{soul}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amssymb}
+\usepackage[small]{caption}
 \usepackage{graphicx}
 \graphicspath{{figures/}}
+\usepackage{amsmath}
+\usepackage{amssymb}       % ADDED. Expectation and set symbols for the policy.
+\usepackage{amsthm}
 \usepackage{booktabs}
-\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[switch]{lineno}
+
+
+\linenumbers
+
+\urlstyle{same}
+
+% PDF Info is required by the kit and must be left untouched. No title or
+% author information belongs in here.
+\pdfinfo{
+/TemplateVersion (IJCAI.2026.0)
+}
+
+% ---------------------------------------------------------------------------
+% CITATION MACROS -- read before adding a citation.
+%
+% ijcai26.sty bundles the `named' citation style and defines exactly four
+% commands: \cite, \shortcite, \citeauthor, \citeyear. There is no \citet and
+% no \citep. Using either is an undefined-control-sequence error, so:
+%
+%   natbib \citep{key}  ->  \cite{key}                        [Author, Year]
+%   natbib \citet{key}  ->  \citeauthor{key}~\shortcite{key}   Author [Year]
+%
+% Do not load natbib to get \citet back; it would fight the style's own \cite.
+% ---------------------------------------------------------------------------
 
 % --- Title (required block 1) ----------------------------------------------
 \title{When to Escalate: A Cost-Aware Belief Policy for Conversational Agents
 Under Hidden Intent}
 
-% Author block is deliberately left to the author kit. Fill in on Day 7.
-\author{}
-\date{}
+% Author block in the kit's single-author form. The \emails section is
+% explicitly optional in the kit and is left out. The kit's macros do not
+% require \affiliations, but its written guidelines make affiliations mandatory
+% for non-anonymous papers, so "Independent" stands in for having none.
+\author{
+    Kapardhi Kannekanti
+    \affiliations
+    Independent
+}
 
 \begin{document}
 
@@ -38,8 +82,35 @@ Under Hidden Intent}
 
 % --- Abstract (required block 2) ------------------------------------------
 \begin{abstract}
-% EMPTY. Write this last, after Results and Failure analysis exist. Do not
-% describe a result here that is not in results/.
+A conversational agent replying to inbound sales leads must choose an action
+before it knows the lead's intent. It can answer, ask a qualifying question,
+hold, or escalate to a human, but the true buying-readiness and whether a human
+is actually needed are hidden. The two ways of being wrong are not equally
+costly. A missed escalation, where a lead who needed a person did not get one,
+is far more expensive than a needless one, and some wrong answers are not a cost
+to trade off at all but a line the agent must not cross. We build a small agent
+that makes this trade-off explicit. It holds a belief over the hidden state,
+split into readiness (hot, warm, cold) and a separate probability that the case
+needs a human, and at each message it picks the action with the lowest expected
+cost under a cost matrix that encodes the asymmetry. Escalation is split into
+notify, where a human is told while the conversation continues, and pause, where
+the agent stops, because the two carry different costs. The hardest wrong
+answers, such as false legal or land claims, are enforced as a hard constraint
+rather than a priced term.
+
+We test on 100 synthetic cases with cached language-model beliefs, comparing the
+cost-aware policy against the same policy with a uniform cost matrix and against
+three fixed-action baselines. The cost-aware policy reaches a mean cost of 1.72
+against 2.58 for the uniform-cost version, so the asymmetry does most of the
+work. Against a policy that escalates every message the result is close to a tie
+on cost, 1.72 against 1.74, but the cost-aware policy reaches it while escalating
+43 times out of 100 rather than all 100, so the gain there is in human load, not
+cost. Every missed escalation traces to one cause: the belief under-estimated the
+needs-human probability rather than misreading readiness, and the model is
+under-confident on that marginal near the threshold, with an expected calibration error of 0.142. We
+also report a failure the test set cannot produce by construction, a high-cost
+message dropped when it arrived batched with a routine one, observed in a live
+run. Code and data are available.
 \end{abstract}
 
 % ---------------------------------------------------------------------------
@@ -71,39 +142,690 @@ is the one used throughout this paper and in every reported result.
 % --- Required section blocks 3-12 -----------------------------------------
 
 \section{Introduction}
-% EMPTY
+\label{sec:intro}
+
+A conversational agent that answers inbound sales leads has to act before it
+knows who it is talking to. The same short message, ``can I get more info'',
+might come from a serious buyer, a competitor fishing for pricing, or an
+automated blast. The agent sees the text. It does not see the intent behind it.
+It still has to do something.
+
+The two ways of getting this wrong are not equally expensive, and that is the
+whole problem. An agent that escalates every uncertain message to a human never
+misses a real buyer, but it spends human attention on messages that never needed
+it. An agent that answers everything itself keeps humans free, but eventually
+gives a confident wrong reply to a lead who needed a person, or worse, answers a
+question it had no business answering, like a request for legal or land
+documents. A naive confidence threshold treats these two failures as if they sat
+on the same scale. They do not. A missed handoff to a human is far more costly
+than a needless one, and some wrong answers are not a cost to trade off at all
+but a line that must not be crossed.
+
+This paper builds a small agent that makes the trade-off explicit. It maintains
+a belief over the lead's hidden state, split into readiness (hot, warm, cold)
+and a separate probability that the case needs a human, and at each message it
+chooses the action with the lowest expected cost under a cost matrix that
+encodes the asymmetry directly. The action set has five members: answer, ask a
+qualifying question, hold, escalate-notify, and escalate-pause. Escalation is
+split into notify and pause because the two carry different costs. A needless
+pause can let a live lead go cold, while a needless notify only spends a human's
+glance. The hardest wrong answers, false legal or land claims, are enforced not
+as a high price but as a hard constraint that removes the answer action
+entirely.
+
+The contribution is not a new algorithm. The decision rule is a textbook
+one-step Bayes decision. The contribution is a careful and honest account of
+what cost-awareness actually buys on this problem, and where it does not help.
+Over 100 synthetic cases with cached language-model beliefs, the cost-aware
+policy reaches a mean cost of 1.72 against 2.58 for the same policy stripped of
+its cost asymmetry, a real gain from making the trade-off explicit. But against
+a policy that simply escalates everything, the cost is close to a tie, 1.72
+against 1.74. What the cost-aware policy buys there is not lower cost but far
+less human load, reaching the same cost while escalating 43 times instead of
+100. We report both comparisons rather than only the favourable one.
+
+The failure analysis is where the design earns or loses trust. Every missed
+escalation traces to a single cause: the belief under-estimated the needs-human
+probability, and did not misread readiness. The model is measurably
+under-confident on that one marginal in two of the bins nearest the threshold, with an expected calibration error of
+0.142 on needs-human, under-confident in exactly the range that suppresses
+escalation. This means the fix is recalibration, not a redesign of the state. We
+also report a failure the test set cannot even exhibit by construction, a
+high-cost message dropped when batched with a routine one at a turn boundary,
+observed in a live run and named as a limitation rather than hidden.
+
+The rest of the paper is organized as follows.
+Section~\ref{sec:related} places the work against learning-to-defer and
+selective-prediction literature and records the design changes that came from
+public discussion with practitioners. Section~\ref{sec:design} gives the agent
+design. Section~\ref{sec:model} gives the probability model and decision rule.
+Section~\ref{sec:method} describes the test. Section~\ref{sec:results} reports
+results, Section~\ref{sec:failure} the failure analysis, and
+Section~\ref{sec:limitations} the limitations, ethics, and human-control
+considerations.
 
 \section{Related work and user discussions}
-% EMPTY. The user-discussion half of this section must trace to rows in
-% ../discussion-record.md.
+\label{sec:related}
+
+\subsection{Related work}
+The escalate action places this work in the \emph{learning-to-defer} literature,
+where an agent chooses between deciding itself and handing off to a human who has
+their own error and cost. \citeauthor{mozannar2020}~\shortcite{mozannar2020} give
+a formal, consistent
+treatment of this, and \citeauthor{madras2018}~\shortcite{madras2018} frame
+deferral with an eye to fairness
+and to the point that a human is not automatically the safer choice. This paper
+uses that framing but does not train a joint defer-classifier. The escalate
+action is priced in a cost matrix rather than learned, and the human is treated
+as a costed fallback rather than modelled with a per-case error rate.
+
+The hold and ask actions are reject options in the sense of selective
+prediction, where a model acts on part of its input and abstains on the rest,
+trading coverage against risk \cite{geifman2017}. The policy here reports how
+often it hands off rather than forcing a decision, which is the coverage side of
+that trade.
+
+The belief comes from a language model, so whether its probabilities can be
+thresholded at all depends on calibration. \citeauthor{guo2017}~\shortcite{guo2017}
+show that modern
+networks trained with a proper scoring rule are still often overconfident, and
+give the expected calibration error and reliability diagram used in
+Section~\ref{sec:results}. Overconfidence matters here in a specific way: it
+makes automated actions look cheaper than they are and suppresses escalation,
+which is exactly the failure the results show.
+
+Finally, the problem is framed as a POMDP, where the true state is hidden and the
+agent acts on a belief \cite{kaelbling1998}. Exact planning over belief space is
+intractable, so this work solves the one-step problem myopically: it minimises
+immediate expected cost under the current belief and does not plan over future
+beliefs. This is a deliberate scope choice, not an oversight, and it has a known
+cost of its own, discussed in Section~\ref{sec:limitations}: a strict one-step
+rule undervalues the ask action, whose payoff is a better belief on the next
+turn rather than an immediate gain.
+
+\subsection{User discussions}
+Several design choices came from posting the problem to practitioners rather than
+from the literature. The record of these exchanges is in the project's
+discussion log; two of them changed the design in ways that the results later
+bore out.
+
+A practitioner building message agents pointed out that treating an empty text
+field as the trigger for escalation is fragile, because reactions, stickers,
+captionless media, and system events all arrive as ``a message with no text'' and
+hit the same branch. The suggested fix was to classify the event type first and
+choose the action from the type, rather than inferring it from the absence of
+text. This maps directly onto a failure the paper reports in
+Section~\ref{sec:failure}: a callback request that arrived batched with a routine
+message was dropped because the two were handled as one turn. The design response,
+a per-message scan for critical triggers before the turn is acted on, is the same
+idea in a different guise: distinct signals should not be collapsed into one
+decision.
+
+A second exchange, on calibration, sharpened how the belief should be checked. The
+point raised was that training on a proper scoring rule pushes toward calibration
+but does not guarantee it, so calibration has to be measured rather than assumed,
+and measured where the decision actually turns rather than uniformly. This is
+what Section~\ref{sec:results} does: the reported calibration error is on the
+needs-human marginal, in the probability range where the escalation threshold
+sits, because that is the range that decides whether a handoff happens.
+
+Other exchanges shaped earlier design decisions without tying as directly to a
+reported result: separating ``cannot parse the input'' from ``understood but not
+confident enough to help'' as distinct reasons for escalation, and tagging each
+hold or escalation with its reason so the reasons can be priced differently.
+These are recorded in the discussion log with the change each one produced.
 
 \section{Agent design}
-% EMPTY
+\label{sec:design}
+
+The agent is defined by seven parts: what it observes, what it cannot see, the
+belief it holds over the hidden part, the actions available to it, the cost of a
+wrong action, the rule that picks an action, and the feedback it gets afterward.
+
+\paragraph{Input.} On each turn the agent receives the inbound message and the
+prior turns of the same conversation. It also receives a small amount of
+position context: the turn index and how many times a near-identical message has
+repeated. Roughly a third of the message types the agent must handle are
+position-dependent, so the same text can warrant a different action depending on
+where in the conversation it lands.
+
+\paragraph{Hidden state.} What the agent cannot see is split into two independent
+parts. The first is \emph{readiness}, one of hot, warm, or cold, which is
+mutually exclusive: at any moment the lead really is in one of these. The second
+is whether the case \emph{needs a human}, which is a separate property of the
+moment, not a fourth readiness level. The two are kept independent on purpose. If
+needs-human competed with hot, warm, and cold for the same probability mass, then
+evidence that a lead is hot would mechanically lower the estimated chance it needs
+a human, which is backwards: a hot, ready-to-buy lead is often exactly the one a
+person should handle. Section~\ref{sec:results} reports that the failures are
+consistent with this independence rather than against it.
+
+\paragraph{Belief.} The belief is what the agent holds over the hidden state
+given everything seen so far: a distribution over hot, warm, cold that sums to
+one, and a separate probability that the case needs a human. The belief comes
+from a language model rather than a trained classifier, which makes calibration
+the load-bearing assumption of the whole design. A language model's stated
+probabilities are often overconfident, and overconfidence makes automated actions
+look cheaper than they are, which suppresses escalation. So the belief is checked
+against labeled cases before any threshold is trusted, and the check is reported
+rather than assumed.
+
+\paragraph{Actions.} The agent chooses one of five: answer, ask a qualifying
+question, hold, escalate-notify (tell a human while the conversation continues),
+and escalate-pause (stop and hand over). Escalation is two actions rather than
+one because notify and pause carry different costs: a needless pause can let a
+live lead go cold, while a needless notify only spends a person's attention.
+Collapsing them would hide that difference from the decision rule.
+
+\paragraph{Cost.} A wrong action has a cost, and the costs are deliberately
+asymmetric. The ordering, from most to least expensive, is: a false assertion, a
+lead who needed a human but was held, a needless pause, a needless notify, a
+needless ask. Correct actions cost nothing, except a correct pause, which carries
+a small residual so the policy does not treat pausing as free and over-use it.
+The false assertion is not merely the most expensive error; on the cases that
+forbid a direct answer, such as a request for legal or land documents, the answer
+action is removed from the choice set entirely. It is a hard constraint, not a
+high price, because there is no belief state that should make the agent send a
+false legal claim. The full matrix and the reasoning behind each value are in
+Section~\ref{sec:model}.
+
+\paragraph{Policy.} The policy computes the expected cost of each available
+action under the current belief and picks the lowest. It is myopic: it reasons
+one step ahead and does not plan over how the belief might change on future turns.
+This is enough for the answer, hold, and escalate actions, whose cost can be
+judged against the current belief. It is a poor fit for the ask action, whose
+value is mostly the better belief it buys next turn, which a one-step rule cannot
+see. This tension is left in the open and discussed in
+Section~\ref{sec:limitations} rather than papered over.
+
+\paragraph{Feedback.} After acting, the agent would in principle observe whether
+the lead converted or whether an escalated case was resolved. That signal is
+delayed, noisy, and partly counterfactual, and a missed escalation has no natural
+label at all: nobody records the lead that needed a human and did not get one. For
+the experiment in this paper, feedback is supplied by labeled synthetic cases
+instead, which is what makes recall on missed escalations measurable at all.
+
+\paragraph{Human-reasoning function.} The one human-like function the agent adds
+is to recognise when a decision is too costly to make alone and route it to a
+person, rather than always acting or always deferring. It maintains an explicit
+belief, updates it as evidence arrives, and escalates specifically when the
+expected cost of acting alone is high. This is what makes escalation a costed
+decision rather than a free safe harbour, and it is the behaviour the rest of the
+paper measures.
 
 \section{Probability model and decision rule}
-% EMPTY. Must agree with ../decisions/probability-decision-record.md.
+\label{sec:model}
 
+\subsection{Belief}
+The agent never observes a lead's true intent. It observes one message
+(optionally with a small amount of conversation context, the turn index and
+repeat count) and forms a belief over two hidden components.
+
+The first is \emph{readiness}, a distribution over three states:
+\begin{equation}
+b_r = \big(P(\text{hot}),\, P(\text{warm}),\, P(\text{cold})\big),
+\qquad \sum_{s} P(s) = 1 .
+\end{equation}
+The second is \emph{needs-human}, a single independent probability that the
+case requires a person regardless of how ready the lead is:
+\begin{equation}
+b_h = P(\text{needs\_human} = \text{True}) \in [0, 1].
+\end{equation}
+
+These are kept separate on purpose. A lead can be ready to buy \emph{and} need
+a human (someone has to confirm a booking), or clearly not ready \emph{and}
+still need a human (an abusive or competitor message a bot should not handle).
+A single confidence score cannot represent either case. Treating readiness and
+needs-human as independent is a modelling assumption, not a measured fact;
+Section~\ref{sec:results} reports evidence that the assumption holds, the
+failures trace to one miscalibrated marginal, not to the two components
+bleeding into each other.
+
+Because the two are independent, the joint probability of any full state
+factors as a product:
+\begin{equation}
+P(s, h) = P(s) \cdot P(h),
+\end{equation}
+where $s \in \{\text{hot}, \text{warm}, \text{cold}\}$ and
+$h \in \{\text{True}, \text{False}\}$.
+This gives six joint states. For the worked case in
+Section~\ref{sec:worked} the belief $b_r = (0.40, 0.50, 0.10)$ and
+$b_h = 0.30$ expand to $P(\text{hot},\text{F}) = 0.28$,
+$P(\text{warm},\text{F}) = 0.35$, $P(\text{cold},\text{F}) = 0.07$,
+$P(\text{hot},\text{T}) = 0.12$, $P(\text{warm},\text{T}) = 0.15$,
+$P(\text{cold},\text{T}) = 0.03$, which sum to 1.
+
+\subsection{Actions and costs}
+The agent chooses one of five actions: \emph{answer}, \emph{ask} (a qualifying
+question), \emph{hold}, \emph{escalate-notify} (tell a human while the
+conversation continues), and \emph{escalate-pause} (stop and hand over). Each
+action has a cost in each of the six joint states, giving the $5 \times 6$
+matrix $C(a, s, h)$ in Table~\ref{tab:costs}.
+
+\begin{table}[t]
+\centering
+\setlength{\tabcolsep}{4pt}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{3}{c}{needs\_human = False} & \multicolumn{3}{c}{needs\_human = True} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Action & hot & warm & cold & hot & warm & cold \\
+\midrule
+answer           & 0 & 0 & 0 & 10 & 10 & 10 \\
+ask              & 2 & 2 & 2 & 4  & 4  & 4  \\
+hold             & 6 & 1 & 0 & 8  & 4  & 3  \\
+escalate\_notify & 3 & 3 & 3 & 0  & 0  & 0  \\
+escalate\_pause  & 6 & 5 & 5 & 2  & 1  & 1  \\
+\bottomrule
+\end{tabular}
+\caption{Cost matrix $C(a,s,h)$. Costs are expert-set; the ordering encodes
+that a missed escalation is far more expensive than a needless one. Correct
+actions cost 0; a correct escalate-pause carries a residual cost of 1 so the
+policy does not treat correct pausing as free. On \texttt{no\_direct\_answer}
+cases the \emph{answer} action is removed from the feasible set, so its row
+does not apply.}
+\label{tab:costs}
+\end{table}
+
+The costs are expert-set, not learned, and their \emph{ordering} is the
+load-bearing part, not the exact magnitudes. Two cells are worth stating
+because they are where the two-part belief does its work. When a lead is hot
+\emph{and} needs a human and the agent holds, the cost is 8, not 16: the two
+harms (the lead waits, no human arrives) overlap rather than stack, and pricing
+it at $6+10$ would exceed the false-assertion cost and break the framing in
+which a false assertion is the top of the scale. When that same lead is
+answered, the cost is 10 with no premium for hotness, since a false claim is
+equally false to a hot or a cold lead.
+
+The false assertion is not merely priced high; it is a \emph{hard constraint}.
+On the cases that carry a \texttt{no\_direct\_answer} flag, the \emph{answer}
+action is removed from the feasible set rather than charged a high price. A
+price can be outweighed if enough other costs pile up; a constraint never can.
+There is no belief state that should ever make the agent send legal or land
+documents, so this is enforced as infeasibility, not as a large number.
+
+\subsection{Decision rule}
+\label{sec:worked}
+The policy is \emph{myopic and one-step}: it picks the action with the lowest
+expected cost under the current belief, with no lookahead over future turns.
+For a feasible action $a$,
+\begin{equation}
+\mathbb{E}[C(a)] = \sum_{s}\sum_{h} P(s)\,P(h)\,C(a, s, h),
+\end{equation}
+and the chosen action is
+\begin{equation}
+a^{\star} = \arg\min_{a \,\in\, \mathcal{A}_{\text{feasible}}} \mathbb{E}[C(a)].
+\end{equation}
+For the worked case above this yields expected costs of escalate-notify 2.10,
+ask 2.60, answer 3.00, hold 3.68, escalate-pause 4.20, so the agent escalates,
+and the realised cost is 0 because the case truly needed a human.
+
+\subsection{Where the threshold comes from}
+Because the readiness rows for \emph{answer} and \emph{escalate-notify} are flat
+across readiness (a false answer costs 10 in any readiness state where a human
+is needed; a needless notify costs 3 in any state where one is not), the choice
+between them reduces to a single threshold on $b_h$. Answer is cheaper while
+$10\,b_h < 3\,(1 - b_h)$, and escalate-notify takes over when the inequality
+flips, at
+\begin{equation}
+b_h^{\star} = \frac{3}{13} \approx 0.2308 .
+\end{equation}
+This crossover is independent of the readiness distribution, precisely because
+both rows are flat across readiness. In the worked case $b_h = 0.30$ clears it
+by 0.069, which is why the agent escalates even though the belief is only
+modestly above the line.
+
+This clean single threshold holds only when the runner-up action is
+\emph{answer}. When \emph{hold} is the competing action its row is not flat
+across readiness, so the threshold becomes readiness-dependent (it ranges from
+roughly 0.31 to 0.38 across the cases in the failure analysis). The policy is
+still a single $\arg\min$; it is only the \emph{reduced} one-dimensional
+threshold that shifts with which action is the alternative.
+
+\subsection{Baseline}
+The baseline is the same decision rule run over an identical belief with a
+\emph{uniform} cost matrix, every non-zero cost replaced by one. This isolates
+exactly what cost-awareness buys: the belief, the feasible-set constraint, and
+the expected-cost machinery are all held fixed, and only the asymmetry is
+removed.
 \section{Test method}
-% EMPTY
+\label{sec:method}
+
+\subsection{Cases}
+The agent is tested on 100 synthetic cases. Each case is one inbound message with
+a label for the true readiness (hot, warm, cold) and whether it truly needs a
+human, plus the position context (turn index and repeat count) the belief sees.
+The cases are built from eleven archetypes that between them cover the situations
+where the cost trade-off actually bites: template openers, requests for photos,
+one-word messages, ready-to-book buyers, requests for legal or land documents,
+messages that suspect the agent is a bot, competitors fishing for pricing,
+captionless media, over-sharers, polite time-wasters, and abusive or off-topic
+messages. The distribution is deliberately weighted toward the archetypes where a
+wrong action is expensive rather than made uniform, and it is skewed toward
+harder cases: 42 of the 100 truly need a human, well above what a live inbox
+would show, so that recall on missed escalations is measurable at all.
+
+The labels are the author's judgment of the intended state, not outcomes observed
+in production. This is stated plainly as a limitation in
+Section~\ref{sec:limitations}: the readiness and needs-human labels are what the
+message was written to represent, not what a real lead later did.
+
+\subsection{Beliefs}
+For each case the belief is produced once by a language model
+(\texttt{gpt-4o-mini}) and cached to disk, keyed by case id. Both policies are
+then run over the identical cached beliefs, so any difference between them comes
+from the decision rule and not from variation in the belief. Caching also makes
+the run reproducible: the language model is non-deterministic, so regenerating the
+beliefs would move every reported number, and the cache is committed alongside the
+code for that reason.
+
+\subsection{Split}
+The 100 cases are split 50/50 into a development and a test half with a fixed
+seed, stratified by archetype and sub-variant so that every variant appears in
+both halves and the needs-human count is balanced (21 in each). The split is not
+redrawn per run. Because the halves are matched by construction, close agreement
+between development and test totals reflects that construction rather than
+out-of-sample generalization, and Section~\ref{sec:results} reads the split
+numbers with that in mind.
+
+\subsection{Policies and baselines}
+Two policies are compared over the same beliefs. The \emph{cost-aware} policy is
+the minimum-expected-cost rule of Section~\ref{sec:model} under the full
+asymmetric cost matrix. The \emph{uniform} baseline is the same rule with every
+non-zero cost replaced by one, which holds the belief, the feasible-set
+constraint, and the expected-cost machinery fixed and removes only the asymmetry.
+This isolates what cost-awareness buys. Three fixed-action baselines are also
+reported for reference: always answer, always ask, and always escalate-notify.
+
+\subsection{Metrics}
+Accuracy alone would hide the thing the design is about, so the run reports mean
+realised cost per case, the number of missed escalations (a case that needed a
+human but did not get one), escalation precision and recall, the number of
+escalations, the number of hard-constraint violations, and the calibration of the
+belief. Calibration is measured as expected calibration error on the needs-human
+marginal, since that is the probability the escalation threshold acts on.
 
 \section{Results}
-% EMPTY. Every number here has to come from a file in ../results/.
+\label{sec:results}
 
+Table~\ref{tab:results} reports all five policies over the 100 cases, on the
+shared cached beliefs.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Policy & Cost & Miss & Prec. & Rec. & Esc. \\
+\midrule
+cost-aware        & 1.72 & 16 & 0.605 & 0.619 & 43 \\
+uniform baseline  & 2.58 & 24 & 0.750 & 0.429 & 24 \\
+always-notify     & 1.74 & 0  & 0.420 & 1.000 & 100 \\
+always-ask        & 2.84 & 42 & --    & 0.000 & 0 \\
+always-answer     & 3.40 & 34 & 1.000 & 0.190 & 8 \\
+\bottomrule
+\end{tabular}
+\caption{Mean cost per case, missed escalations, escalation precision and recall,
+and number of escalations, over 100 cases. Lower cost and fewer misses are
+better. The cost-aware policy records zero hard-constraint violations.}
+\label{tab:results}
+\end{table}
+
+\subsection{What cost-awareness buys}
+The cost-aware policy reaches a mean cost of 1.72 against 2.58 for the uniform
+baseline, a reduction of a third over 100 shared beliefs. Because the two
+policies differ only in whether the cost matrix is asymmetric, this gap is what
+cost-awareness buys and nothing else. The two disagree on 46 of the 100 cases,
+and the cost-aware policy is not cheaper on more of them: it is cheaper on 15,
+the baseline is cheaper on 18, and 13 are ties. It wins overall because its
+losses are small and its wins are large. Almost every swap it makes is answer to
+hold or answer to escalate-notify, trading many small costs of two or three for a
+few avoided false assertions of ten. The point of the design is not to be right
+more often but to be wrong more cheaply.
+
+\subsection{The comparison that is a tie, not a win}
+Against always-notify, which escalates every message, the cost result is close to
+a tie: 1.72 against 1.74. This is not a mistake in the design, it is a property of
+the cost matrix. A needless notify costs 3 and a false assertion costs 10, so
+escalating everything is cheap and is barely punished; blanket escalation almost
+never pays the expensive error. The honest claim here is therefore not that the
+cost-aware policy is cheaper than always-notify, because on cost it essentially is
+not. What it buys is human load. It reaches the same cost while escalating 43
+times out of 100 rather than all 100, at a precision of 0.605 against 0.420. The
+same outcome without dragging a person into more than half again as many
+conversations is the operational win, and it is a different claim from a cost win,
+so both are reported.
+
+\subsection{The development and test split}
+Both halves reach the same total cost for the cost-aware policy (86 each) and for
+the uniform baseline (129 each). This looks like clean generalization and is not.
+The split was stratified by archetype and sub-variant and balanced on the
+needs-human count, so the two halves are matched by construction and the totals
+coincide for that reason. The policies do make different decisions on the two
+halves (the escalation precision differs across them), so the halves are not
+identical case-for-case; the aggregate totals simply agree because the halves were
+built to mirror each other. On synthetic data of this kind, matched by design,
+this figure cannot stand as out-of-sample evidence, and it is not read as such.
+
+\subsection{Calibration}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{reliability-needs-human.pdf}
+    \caption{Reliability of the \texttt{needs\_human} marginal over all 100 cases,
+    ECE 0.142. Points above the diagonal are under-confident: the belief reports a low
+    probability where the observed frequency is high. The vertical line is the
+    escalation threshold $b_h^{\star} = 3/13 \approx 0.231$. The two bins straddling
+    it are under-confident by 0.300 and 0.288, which is the mechanism behind all 16
+    missed escalations. The 0.7--0.8 bin is over-confident by 0.367 on only 6 cases,
+    so the belief is not uniformly under-confident; bins 0.5--0.7 are empty, hence the
+    break in the curve.}
+    \label{fig:reliability}
+    \end{figure}
+    
+Every one of the 16 missed escalations came from the same place: the belief
+under-estimated the needs-human probability, not the readiness. On all 16, the
+needs-human estimate was 0.30 or below against a true label of needing a human,
+while the readiness argmax on those same cases was spread across cold, hot, and
+warm and was often correct and confident. The belief is measurably
+under-confident on the needs-human marginal, with an expected calibration error
+of 0.142 and reliability bins (Figure~\ref{fig:reliability}) that read low against observed frequency in exactly
+the range where the escalation threshold sits (for example, a predicted 0.10
+against an observed 0.40, and a predicted 0.30 against an observed 0.588). Because
+the failures trace to one miscalibrated marginal rather than to the two hidden
+components interfering, they are evidence for the independent two-part belief
+rather than against it, and they point at recalibration as the fix rather than a
+redesign of the state.
 \section{Failure analysis}
-% EMPTY
+\label{sec:failure}
 
-\section{Limitations ethics and human control}
-% EMPTY
+The cost-aware policy makes 16 missed escalations and no other class of error
+worth naming: no hard-constraint violations, and its needless actions are the
+cheap ones the design is willing to pay. So the failure analysis is almost
+entirely about the misses. Five are examined in detail below, chosen to cover the
+distinct ways a miss happens.
+
+\subsection{The shared cause}
+All 16 misses have the single cause described in Section~\ref{sec:results}: an
+under-estimated needs-human probability. None of them come from the two hidden
+components being confused with each other. This matters for how the misses should
+be counted. Treating every miss as a false assertion at cost 10 overstates the
+damage, because a \emph{hold} is a partial hedge: it is the wrong action, but it
+does not deliver a false answer, so the matrix charges it 3 or 4 rather than 10.
+Across the 16 misses the realised costs are nine at 10, four at 3, and three at 4,
+for 114 in total, not the 160 that costing every miss at 10 would give. The
+analysis reports 114.
+
+\subsection{Five cases}
+Table~\ref{tab:failures} lists five misses and the mode each one represents.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lr p{3.2cm}}
+\toprule
+Case & Cost & Mode \\
+\midrule
+a11-repeated-097 & 10 & tie-break, not the cost model \\
+a04-booking-042 & 10 & readiness right, needs-human wrong \\
+a02-deep-015 & 10 & missed the threshold by 0.031 \\
+a03-followup-024 & 4 & hold looked cheap, readiness also off \\
+a10-persistent-091 & 3 & cheapest miss the matrix allows \\
+\bottomrule
+\end{tabular}
+\caption{Five missed escalations, one per failure mode.}
+\label{tab:failures}
+\end{table}
+
+The three that realise the full cost of 10 fail in different ways.
+\texttt{a04-booking-042} is the cleanest illustration of the shared cause: the
+readiness estimate was right and confident, and only the needs-human number
+failed, so nothing about readiness could have saved it. \texttt{a02-deep-015}
+missed the escalation threshold by 0.031, a case that recalibration would very
+likely recover, since it sits just below the line. \texttt{a11-repeated-097} is
+the worst of the three, and it is worst for a reason that is not the cost number.
+Its belief is the furthest from the flip point of any miss: it needed a
+needs-human estimate above 0.50 and the model reported 0.00, so recalibration
+would not save it the way it would save the near-threshold cases. And it was not
+decided by the cost model at all. Two actions came out with an expected cost of
+exactly 0.000, and the tie was broken by the fixed ordering of the action list
+rather than by any cost comparison. In the true state, holding would have cost 3,
+so 7 of its 10 realised points are attributable to an implementation detail, the
+tie-break, rather than to a property of the policy.
+
+The two cheaper misses show why not every miss is a false assertion.
+\texttt{a03-followup-024} and \texttt{a10-persistent-091} were held rather than
+answered, so they cost 4 and 3 rather than 10. For these the binding comparison
+is hold against escalate-notify, not answer against escalate-notify, and because
+the hold row is not flat across readiness their thresholds are readiness-dependent
+rather than the clean 3/13 of the answer cases. Reporting them at their true cost,
+rather than rounding every miss up to 10, is what keeps the miss total honest.
+
+
+\subsection{A failure the test set cannot show}
+One failure did not come from the synthetic run at all. In a live deployment a
+lead sent a routine request for information and, before the agent had replied, a
+second short message asking to be contacted directly by a person. The agent acted
+on the routine message and silently dropped the second, which carried the only
+needs-human signal in the turn. The rare, high-cost signal was averaged away by
+the common, low-cost one because the two messages were handled as a single turn.
+
+This is a different kind of failure from the 16 misses. Those are belief-scoring
+errors on a single message. This one is a turn-boundary error: the important
+message never received its own belief evaluation. The synthetic test set cannot
+produce it by construction, because every case carries one message as a single
+string and the harness scores one message per turn. Surfacing this class of
+failure would need multi-message-per-turn cases and a per-message evaluation step
+before the turn is acted on, neither of which this experiment has, so none of the
+numbers reported here bear on it. It is recorded here, and as a limitation in
+Section~\ref{sec:limitations}, rather than left out because the harness happens
+not to reach it. It is also the failure that several practitioners, on being shown
+it, independently proposed the same fix for: scan each message for a small set of
+critical intents before the turn is scored as a whole, so that a rare handoff
+signal overrides rather than averages into the turn.
+\section{Limitations, ethics, and human control}
+\label{sec:limitations}
+
+\subsection{Limitations}
+The results rest on synthetic data, and several of the paper's numbers are only
+measurable because of that. The clearest case is recall on missed escalations. In
+a live inbox there is no label for the lead who needed a human and did not get
+one, so escalation recall cannot be measured at all; it is measurable here only
+because the cases are labeled by construction. The needs-human base rate of 42\%
+is likewise inflated well above what a real inbox would show, chosen so that
+recall is estimable, which means the precision and recall reported here will not
+transfer to production. The readiness and needs-human labels are the author's
+judgment of what each message was written to represent, not outcomes observed from
+real leads, so they carry the author's assumptions about intent.
+
+The state space is deliberately coarse and this costs the model in two visible
+ways. Non-leads such as competitors and abusive messages are labelled cold rather
+than given their own state, which slightly distorts readiness calibration. And the
+state cannot separate a competitor fishing for pricing from an abusive message:
+both come out as cold and needing a human, yet the two call for different actions.
+The state space simply cannot see the difference, which is a real finding about
+its granularity rather than a bug in the policy.
+
+Two limitations are structural to the method rather than to the data. The policy
+is myopic, so it undervalues the ask action, whose payoff is a better belief on
+the next turn that a one-step rule cannot price; the honest handling of the ask
+action would compute its one-step value of information, which this design does not
+do. And the hard constraint that removes the answer action on restricted cases is
+treated here as observable and error-free, because a flag on the case says the
+message asks for legal or land documents. A production detector for that condition
+would carry its own false-positive and false-negative rates, which this experiment
+does not model.
+
+Finally, one whole class of failure is invisible to the test set by construction.
+As Section~\ref{sec:failure} describes, a high-cost signal batched with a routine
+message at a turn boundary cannot occur in a set where every case is a single
+message scored on its own. This is the sharpest version of the general point that
+synthetic data trades realism for measurability: here the trade hides not a
+distorted number but an entire failure mode.
+
+\subsection{Ethics and human control}
+The system decides when a person is pulled into a conversation, and the costs are
+set to make missing a needed human more expensive than a needless handoff. That is
+deliberate, but it means the agent will sometimes escalate cases that did not need
+it, spending human attention as the price of not missing the ones that did. The
+hard constraint on false legal and land claims is the other side of this: some
+answers are treated as a line the agent may not cross at any belief, rather than a
+cost to be traded off, because the harm of a confident false claim on a
+consequential matter is not the kind of thing a cheaper action elsewhere should be
+able to outweigh.
+
+A deeper point raised in the live discussion is worth recording as a direction the
+current design does not yet meet. The turn-boundary failure is not only a scanning
+problem; the underlying issue is that a message was droppable at all. A more robust
+design would make every inbound item durable, with an explicit acknowledge or
+close step, so that a request for a human keeps returning until something resolves
+it, regardless of how a later ranking scores its priority. Priority can be fuzzy;
+existence should not be. The present design scans for critical signals before the
+turn is acted on, which reduces the risk, but it does not yet guarantee that no
+message can be silently dropped, and that guarantee is the right target for a
+production system.
 
 \section{Conclusion and new questions}
-% EMPTY
+\label{sec:conclusion}
 
+This paper built a small agent that decides, on each inbound message, whether to
+answer, ask, hold, or escalate to a human in one of two ways, when the lead's
+readiness and whether they need a person are both hidden. The decision rule is a
+textbook one: minimise expected cost under a belief. The contribution is not the
+rule but an honest account of what it buys. Making the cost matrix asymmetric
+cuts mean cost by a third against the same rule without that asymmetry. Against a
+policy that simply escalates everything, it does not cut cost at all, and the
+paper says so; what it buys there is reaching the same cost while escalating fewer
+than half as often. Every missed escalation traces to one miscalibrated marginal
+rather than to any confusion between the two hidden components, which is evidence
+for the two-part belief and points at recalibration rather than redesign.
+
+Three questions follow directly from these results.
+
+The first is calibration. If every miss comes from an under-confident needs-human
+estimate, then recalibrating that one marginal, rather than changing anything
+about the policy or the state, should recover most of the misses. The
+near-threshold cases in the failure analysis suggest this would work; the case
+whose belief was far from the threshold suggests it has a floor. Measuring where
+that floor sits is the most immediate next step.
+
+The second is the ask action. A myopic policy cannot price the value of asking,
+because that value is a better belief next turn. Scoring the ask action by its
+one-step value of information, and testing whether it then earns its place against
+hold and escalate, would close the gap the current design leaves open, and would
+say whether the action is genuinely useful or merely unpriced.
+
+The third is the turn boundary. The one failure the synthetic test set cannot
+produce is the one that came from a live run, where a high-cost signal was lost
+when batched with a routine message. Building cases with more than one message per
+turn, and a per-message scan that lets a rare critical signal override the turn,
+would let this failure be measured rather than only reported, and would test the
+durability idea that no inbound message should be silently droppable in the first
+place.
 % --- References (required block 12) ---------------------------------------
-% Replace this whole block with the author kit's bibliography commands once
-% references.bib has entries, e.g. the kit's \bibliographystyle followed by
-% \bibliography{references}. Kept as a plain heading for now so the file
-% compiles with an empty references.bib and no \cite commands.
-\section*{References}
-% EMPTY
+% The kit's two bibliography commands. named.bst sits next to this file and
+% generates its own "References" heading, so there is no \section* here.
+% Switched on because references.bib now has entries and the paper cites five
+% of them; see the citation-macro note in the preamble before adding more.
+\bibliographystyle{named}
+\bibliography{references}
 
 \end{document}
