@@ -212,8 +212,8 @@ def _notify_vs_hold_crossover(readiness_dist: dict) -> float | None:
 
 
 def check_hold_threshold(rows: list[dict]) -> dict:
-    """The paper states the hold-competing threshold "ranges from roughly 0.31 to
-    0.38". Check that against both readings of the claim.
+    """The paper states the hold-competing crossover falls in [0.018, 0.500] on the
+    73 cases where it lands in [0, 1] at all. Check that against both readings.
 
     Pure readiness states give one set of crossovers; the actual per-case readiness
     distributions give another. Only the second is a claim about this experiment,
@@ -239,7 +239,7 @@ def check_hold_threshold(rows: list[dict]) -> dict:
             "min": min(in_range) if in_range else None,
             "max": max(in_range) if in_range else None,
         },
-        "paper_claimed_band": [0.31, 0.38],
+        "paper_claimed_in_unit_range": [0.018, 0.500],
     }
 
 
@@ -698,7 +698,7 @@ def main() -> int:
           f"[{h['per_case_min']:.3f}, {h['per_case_max']:.3f}]; "
           f"{u['n']} of 100 fall inside [0,1] "
           f"(range [{u['min']:.3f}, {u['max']:.3f}])")
-    print(f"  paper claims the band is {h['paper_claimed_band']}")
+    print(f"  paper claims the in-range span is {h['paper_claimed_in_unit_range']}")
 
     print("\n=== 3. Cost-magnitude sensitivity (ordering preserved throughout) ===")
     for cell, sweep in findings["cost_sweep"].items():

@@ -48,9 +48,9 @@
       "min": 0.017857142857142794,
       "max": 0.5
     },
-    "paper_claimed_band": [
-      0.31,
-      0.38
+    "paper_claimed_in_unit_range": [
+      0.018,
+      0.5
     ]
   },
   "cost_sweep": {

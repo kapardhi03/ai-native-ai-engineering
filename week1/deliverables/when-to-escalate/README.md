@@ -5,8 +5,8 @@ discussions, the agent and probability-model decision records, the synthetic tes
 harness and its results, the AI review record, the LaTeX preprint, and the two
 social posts.
 
-Still outstanding: both social posts, and the AI-use statement at the bottom of
-this file. The layout below says so rather than implying otherwise.
+Still outstanding: both social posts. The layout below says so rather than
+implying otherwise.
 
 ## Paper
 
@@ -36,17 +36,19 @@ Graded deliverables:
   accounts, five read sources, open questions, the AI prompts used verbatim, and
   the AI errors caught.
 - `discussion-record.md` — public-discussion log and the design change (if any)
-  each useful reply produced. 13 rows; 5 still note a reply that is in the thread
-  but not transcribed here.
+  each useful reply produced. 14 rows, every one carrying my reply as posted. It
+  opens with a `## Corrections` section: one thread was first logged from memory,
+  which credited two replies to the wrong commenter and missed two others, and the
+  original attributions are recorded rather than quietly swapped.
 - `review-record.md` — AI review comments with accept/reject and reason for each,
   over three reviews (practitioner, probability/decision-theory, conference referee):
-  29 comments, each with the section it points at as evidence, plus a per-review
+  23 comments, each with the section it points at as evidence, plus a per-review
   summary.
 - `decisions/probability-decision-record.md` — one worked belief-update-to-action
   record for a single case (`a02-deep-018`), including the six-step update.
 - `paper/` — LaTeX source (`main.tex`), the IJCAI style files, `references.bib`,
   and `figures/make_figures.py`. The rendered figure is an input to the compile and
-  is **not currently present**; see step 5.
+  is deliberately not committed; see step 5.
 - `src/` — belief update (`belief.py`), configuration (`config.py`), cost model and
   policy (`costs.py`), and the belief providers (`providers/`).
 - `data/` — the case generator (`build_cases.py`), the synthetic conversation set
@@ -172,11 +174,12 @@ Reads `results/run.json`; nothing is transcribed by hand. Writes
 `reliability-needs-human.pdf` and `.png` next to the script.
 
 **This has to be run before the paper will compile.** `main.tex` includes the PDF
-via `\includegraphics`, and the PDF is not in the repository — it needs
-`matplotlib`, which nothing else here depends on. Note that `.gitignore` currently
-lists this exact file, so generating it is not enough to make it ship: a fresh
-clone still cannot compile the paper until either the figure is committed or the
-ignore rule is dropped.
+via `\includegraphics`, and the PDF is not in the repository by choice: it is listed
+in `.gitignore` because it is a build product of `results/run.json`, not a source
+file, and it needs `matplotlib`, which nothing else here depends on. So a fresh
+clone regenerates the figure rather than receiving it — this step is a prerequisite
+of the compile, not a repair. `results/run.json` is committed, so the figure it
+produces is fixed.
 
 Add `--check` to print every plotted value — bin counts, predicted and observed
 rates, gaps, and Wilson intervals — without needing matplotlib. That path is
@@ -204,7 +207,36 @@ one.
 
 ## AI-use statement
 
-<!-- To fill in. State which AI tools were used and for what (e.g. preparing
-     research terms and queries, drafting and repairing code, LaTeX assistance,
-     review passes), and affirm that all content was verified by me and that no
-     fabricated conversations, untested results, or unread references are included. -->
+AI was used as a tool under my direction, not as an author. I chose the problem,
+made and locked every design decision, set the cost values and their ordering,
+wrote every public discussion contribution myself, and checked every reported
+number against the committed run artifacts.
+
+| Used for | Tool |
+| --- | --- |
+| Preparing the research file — technical terms at my level, grouped search queries, and candidate communities and accounts to verify myself. The prompt is in `research-file.md` verbatim, including the instruction to flag its own uncertainty rather than guess. | Claude, ChatGPT, Gemini |
+| Reading the five sources in depth — symbol-by-symbol explanation of the formulas, a usefulness verdict, and multiple-choice quizzing to test my own grasp before deciding whether a paper fitted the project. | NotebookLM |
+| Scaffolding, writing and repairing the code in `src/`, `data/`, `experiments/` and `tests/`; running the harness; LaTeX work on the preprint; and the record-keeping in this repository, including the visible corrections in `results/wrong-decisions.md`. | Claude / Claude Code |
+| Three adversarial review passes over the draft — a practitioner pass, a probability and decision-theory pass, and a conference-referee pass. All 23 comments are in `review-record.md` with accept or reject, the reason, and the section each one points at. | ChatGPT (GPT), Gemini Spark |
+| Finding candidate X posts to reply to each day, with an explicit instruction not to invent URLs and to return fewer if it could not find good ones. Which ones I actually replied to, and what came back, is in `discussion-record.md`. | Boardy |
+| Not an authoring tool: generating the 100 beliefs that are the experiment's *input*. See "What a reproduction cannot check" above. | `gpt-4o-mini` |
+
+Every AI output was checked before it was used. The five cases where a tool was
+confidently wrong are logged in the "Important AI errors" table in
+`research-file.md`, with how each was caught — including a synthesis that
+recommended an architecture directly contradicting the locked design, and an
+unverified bound attributed to a mis-cited source. Neither was carried into the
+paper. AI drafts of public-facing replies were dropped once it was clear they read
+as AI-written; AI is used to pressure-test my public writing, not to ghostwrite it.
+Per-decision provenance — what I set versus what a tool proposed — is recorded in
+`build-log.md` at the point each decision was made.
+
+I affirm that no conversation in `discussion-record.md` is fabricated: every row
+links to a real public thread, quotes a real person's reply, and records my own
+reply as posted. Every number in the paper and in `results/` comes from a real run
+of the committed code over the committed data, reproducible with the commands
+above. No reference is cited that I did not read; where a tool asserted something
+about a source that I have not confirmed at source, it is marked unconfirmed in the
+AI-error table rather than stated as fact.
+
+The paper carries the same statement in its `AI-use statement` section.

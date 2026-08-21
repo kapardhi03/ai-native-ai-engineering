@@ -24,6 +24,7 @@ was believed when the run was analysed.
 | C2 | 2026-08-21 | "Which of the five costs most", closing paragraph | The `a11-repeated-097` tie-break was written as a live defect. It has since been fixed; the case is retained because the reported run predates the fix. |
 | C3 | 2026-08-21 | "The common failure mode", closing paragraph | **Retraction.** The misses were claimed as evidence *for* the independence of locked design 0a. The run records only the two marginals, never the joint, so it cannot be evidence either way. |
 | C4 | 2026-08-21 | "3. Just below the threshold" | `a02-deep-015` was described as missing the threshold by 0.031. The arithmetic stands, but the belief is quantized to one decimal, so the gap is a full step of its granularity, not three hundredths. |
+| C5 | 2026-08-22 | C1's note below | C1 flagged the case table's `≥ 0.306` for `a10-persistent-091` as a rounding discrepancy against the exact `1.8/5.9 = 0.30508`, and left it uncorrected. It is not a discrepancy. The cell states a threshold the belief has to *clear*, and 0.305 does not clear 0.30508 while 0.306 does, so 0.306 is the smallest three-decimal value that actually flips the decision. The note now records that, instead of flagging it as unresolved. No value in this file or in the paper changes. |
 
 ## The population these five come from
 
@@ -93,9 +94,13 @@ Two different comparisons set it:
   **Corrected C1 (2026-08-21).** Two of these five cases chose `hold`, and they
   flip at **0.3051** (`a10-persistent-091`, = 1.8/5.9) and **0.3729**
   (`a03-followup-024`, = 2.2/5.9), so the upper end above was overstated by 0.007.
-  *Note:* the case table for `a10-persistent-091` below, and the paper, both round
-  the first of these to 0.306; at three decimals it is 0.305. Left as found rather
-  than corrected here, since it is also in the paper. The larger problem is that two
+  *Note:* the case table for `a10-persistent-091` below, and the paper, both state
+  this flip point as `≥ 0.306`. That is a round-up, not a rounding error: the cell
+  states a value the belief has to *clear*, and 0.305 does not clear 0.305085 while
+  0.306 does, so 0.306 is the smallest three-decimal value that actually flips the
+  decision. `a03-followup-024`'s `≥ 0.373` (exact 0.372881) is the same round-up.
+  Exact crossovers are given to four decimals here; the case tables round up to
+  three. See C5. The larger problem is that two
   cases are not a band. Solving `E[notify] = E[hold]` against each of the 100
   recorded readiness distributions puts the flip point inside `[0, 1]` on **73**
   cases, spanning **`[0.018, 0.500]`**; on the remaining **27** it is negative,
@@ -213,7 +218,7 @@ raises the flip point the belief had to clear.
 | chose | `hold`, margin **0.220** |
 | correct action | `escalate_notify` (cell `cold\|True` = 0) |
 | cost incurred | **3** — cell `hold[cold\|True]` |
-| flip point | `needs_human` ≥ 0.305 (belief was 0.20, short by 0.105) |
+| flip point | `needs_human` ≥ 0.306 (belief was 0.20, short by 0.106) |
 
 The lowest-cost miss available in the matrix. `hold` on a lead that is genuinely
 `cold` incurs 3 rather than 10, because holding a cold lead wastes little even

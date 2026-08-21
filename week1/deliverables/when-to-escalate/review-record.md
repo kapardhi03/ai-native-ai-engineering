@@ -16,7 +16,7 @@
 
 **Practitioner review summary.** Nine comments. Eight point at limitations the paper already confronts (independence retraction, cost sensitivity, unused actions, detector error, state granularity, engineered distribution); logged as accept/no-change with the section as evidence, or reject-on-scope. One (message durability) is a genuine partial gap: mitigated by the per-message scan but not guaranteed, and named as future work in §8.2. No change of substance was required; the exercise confirmed the limitations section is complete rather than surfacing a missing one.
 
-### Review 2 — Probability / decision-theory (ChatGPT / GPT)
+### Review 2 — Probability / decision-theory (Gemini Spark)
 
 | AI tool | Review comment | Accept or reject | Reason | Change | Evidence |
 | --- | --- | --- | --- | --- | --- |
