@@ -104,8 +104,7 @@ three fixed-action baselines. The cost-aware policy reaches a mean cost of 1.72
 against 2.58 for the uniform-cost version, so the asymmetry does most of the
 work --- though the uniform baseline turns out to select the same action as a plain
 $0.5$ threshold on all 100 cases, and reweighting the case set toward the design's
-own readiness prior narrows the gap from 0.86 to 0.07, so we report the direction of
-that result with more confidence than its magnitude. Against a policy that escalates
+own readiness prior moves the gap from 0.86 to 1.07 rather than closing it, so the result's direction is robust to reweighting even as its magnitude shifts. Against a policy that escalates
 every message the result is close to a tie
 on cost, 1.72 against 1.74, but the cost-aware policy reaches it while escalating
 43 times out of 100 rather than all 100, so the gain there is in human load, not
@@ -978,7 +977,7 @@ Because the case set's readiness distribution does not match the prior the desig
 assumes, the reported means are sensitive to reweighting. Importance-weighting each
 case toward the module's own prior (weights: hot 0.087, warm 0.342, cold 2.180)
 moves the cost-aware policy from 1.720 to 1.456 and the uniform baseline from 2.580
-to 2.526 --- the gap narrows from 0.86 to 0.07. It also reverses the comparison
+to 2.526 --- the gap widens from 0.86 to 1.07. It also reverses the comparison
 against always-notify, which moves from 1.740 to 1.834. The direction of the main
 result survives reweighting; its magnitude does not. Since the prior itself is
 expert-set rather than measured, neither weighting is the authoritative one, and the
