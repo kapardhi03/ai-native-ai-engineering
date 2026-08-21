@@ -5,6 +5,9 @@ discussions, the agent and probability-model decision records, the synthetic tes
 harness and its results, the AI review record, the LaTeX preprint, and the two
 social posts.
 
+Still outstanding: both social posts, and the AI-use statement at the bottom of
+this file. The layout below says so rather than implying otherwise.
+
 ## Paper
 
 **When to Escalate: A Cost-Aware Belief Policy for Conversational Agents Under
@@ -27,31 +30,60 @@ policy over the belief, not full belief-state planning.
 
 ## Repository layout
 
+Graded deliverables:
+
 - `research-file.md` — technical terms, search queries, verified communities and
-  accounts, sources, and open questions.
+  accounts, five read sources, open questions, the AI prompts used verbatim, and
+  the AI errors caught.
 - `discussion-record.md` — public-discussion log and the design change (if any)
-  each useful reply produced.
-- `review-record.md` — AI review comments, with accept/reject and reason for each.
+  each useful reply produced. 13 rows; 5 still note a reply that is in the thread
+  but not transcribed here.
+- `review-record.md` — AI review comments with accept/reject and reason for each,
+  over three reviews (practitioner, probability/decision-theory, conference referee):
+  29 comments, each with the section it points at as evidence, plus a per-review
+  summary.
 - `decisions/probability-decision-record.md` — one worked belief-update-to-action
-  record for a single case.
-- `paper/` — LaTeX source, references, figures, and the compiled preprint.
-- `src/` — agent, belief update, cost model, and policy.
-- `data/` — the synthetic conversation set used for testing.
+  record for a single case (`a02-deep-018`), including the six-step update.
+- `paper/` — LaTeX source (`main.tex`), the IJCAI style files, `references.bib`,
+  and `figures/make_figures.py`. The rendered figure is an input to the compile and
+  is **not currently present**; see step 5.
+- `src/` — belief update (`belief.py`), configuration (`config.py`), cost model and
+  policy (`costs.py`), and the belief providers (`providers/`).
+- `data/` — the case generator (`build_cases.py`), the synthetic conversation set
+  (`cases.json`), and the committed belief cache (`belief_cache.json`).
 - `experiments/` — the test harness (`run_policies.py`) and the robustness and
   sensitivity checks (`robustness.py`).
-- `results/` — predictions, actions, metrics, and figures from a run.
-- `social/` — the LinkedIn post and the X thread.
+- `results/` — `run.json` (per-case beliefs, decisions, realised costs), `run.md`
+  (the summary tables), `robustness.json` (the sensitivity output), and
+  `wrong-decisions.md` (the five-failure analysis). `wrong-decisions.md` carries a
+  `## Corrections` section: four claims in it were corrected after the run was
+  analysed, and the original wording is struck rather than deleted.
+- `social/` — the LinkedIn post and the X thread. **Both are still section
+  skeletons, not written posts.**
+
+Working files, not graded:
+
+- `build-log.md` — every design decision with its verdict and reason, the open
+  questions, the limitations carried into the paper (L1–L8), and the findings
+  (F1–F7). Rows are never edited after the fact; a reversal is added as a new row
+  that supersedes the old one.
+- `PLAN.md` — the day-by-day working plan.
+- `tests/` — 337 tests; see step 6.
 
 ## How to reproduce the test
 
 No API key is needed and no network call is made. The belief cache in
 `data/belief_cache.json` covers all 100 cases, and `BELIEF_CACHE_ONLY=true` serves
 every belief from it and **errors on a miss** rather than quietly generating a fresh
-one. All commands below are run from this directory (`week1/deliverables/when-to-escalate`).
+one.
 
-### 1. Environment
+Steps 2–5 run from this directory (`week1/deliverables/when-to-escalate`). Steps 1
+and 6 run from the repository root, because the virtualenv and `requirements.txt`
+live there; each step says which.
 
-Python 3.11+ (developed on 3.14). From the repository root:
+### 1. Environment (from the repository root)
+
+Python 3.11+ (developed on 3.14).
 
 ```bash
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
@@ -69,6 +101,8 @@ sub-variant. Writing it to a scratch path and diffing should show no change.
 ```bash
 python3 data/build_cases.py /tmp/cases_check.json && diff /tmp/cases_check.json data/cases.json && echo "IDENTICAL"
 ```
+
+Verified: prints `IDENTICAL`.
 
 ### 3. Run the policies
 
@@ -104,7 +138,14 @@ restores the old behaviour and exists so the committed artifact stays verifiable
 Dropping the flag changes exactly one case (`a11-repeated-097`, `answer` → `hold`)
 and gives mean cost **1.65** instead of 1.72; misses and escalations are unchanged
 at 16 and 43. Both are correct outputs of the code — the paper reports 1.72 and
-says why in its failure analysis.
+says why in its failure analysis. It is also the only decision the flag *could*
+change: it is the one case in the 100 where two feasible actions come out at
+exactly equal expected cost.
+
+The five worst decisions from this run, with the belief that produced each one, are
+written up in `results/wrong-decisions.md`. Read its `## Corrections` section first:
+four claims in that file were corrected after the fact, including the framing of
+`a11-repeated-097`.
 
 ### 4. Robustness and sensitivity checks
 
@@ -128,19 +169,28 @@ python3 paper/figures/make_figures.py
 ```
 
 Reads `results/run.json`; nothing is transcribed by hand. Writes
-`reliability-needs-human.pdf` and `.png` next to the script. `main.tex` includes
-the PDF, so it must exist before the paper will compile. Add `--check` to print
-every plotted value without needing matplotlib.
+`reliability-needs-human.pdf` and `.png` next to the script.
 
-### 6. Tests
+**This has to be run before the paper will compile.** `main.tex` includes the PDF
+via `\includegraphics`, and the PDF is not in the repository — it needs
+`matplotlib`, which nothing else here depends on. Note that `.gitignore` currently
+lists this exact file, so generating it is not enough to make it ship: a fresh
+clone still cannot compile the paper until either the figure is committed or the
+ignore rule is dropped.
+
+Add `--check` to print every plotted value — bin counts, predicted and observed
+rates, gaps, and Wilson intervals — without needing matplotlib. That path is
+verified; the render is not, on a machine without matplotlib.
+
+### 6. Tests (from the repository root)
 
 ```bash
 ./.venv/bin/python -m pytest week1/deliverables/when-to-escalate -q
 ```
 
-337 tests, run from the repository root. They cover the cost matrix and the hard
-constraint (including that no belief can buy past it), the tie-break, the cache's
-staleness and provenance behaviour, and configuration validation.
+337 tests, all passing. They cover the cost matrix and the hard constraint
+(including that no belief can buy past it), the tie-break, the cache's staleness
+and provenance behaviour, and configuration validation.
 
 ### What a reproduction cannot check
 
