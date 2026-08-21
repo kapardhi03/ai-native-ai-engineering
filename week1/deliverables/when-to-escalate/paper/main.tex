@@ -787,7 +787,15 @@ does not deliver a false answer, so the matrix charges it 3 or 4 rather than 10.
 Across the 16 misses the realised costs are nine at 10, four at 3, and three at 4,
 for 114 in total, not the 160 that costing every miss at 10 would give. The
 analysis reports 114.
-
+One caveat belongs with this diagnosis. That every miss traces to an
+under-estimated needs-human probability is a statement about this labelling
+scheme, not a proof of the underlying causal mechanism: the experiment does not
+independently exclude cost-model misspecification, the coarse three-state
+readiness space, or the one-decimal quantization of the belief as contributing
+causes, and the recalibration in §7.3 is an in-sample ceiling rather than a
+held-out test. What can be said is the narrower claim the rest of this section
+makes --- the misses localise to one marginal --- not that no other factor
+bears on them.
 \subsection{Five cases}
 Table~\ref{tab:failures} lists five misses and the mode each one represents.
 
@@ -1000,7 +1008,7 @@ answers are treated as a line the agent may not cross at any belief, rather than
 cost to be traded off, because the harm of a confident false claim on a
 consequential matter is not the kind of thing a cheaper action elsewhere should be
 able to outweigh.
-
+The experiment only measures the cost of choosing to escalate. It doesn’t account for what happens afterward—such as human mistakes, limited capacity, or unclear accountability. Those are left for future research.
 A deeper point raised in the live discussion is worth recording as a direction the
 current design does not yet meet. The turn-boundary failure is not only a scanning
 problem; the underlying issue is that a message was droppable at all. A more robust
@@ -1064,6 +1072,33 @@ place.
 % generates its own "References" heading, so there is no \section* here.
 % Switched on because references.bib now has entries and the paper cites five
 % of them; see the citation-macro note in the preamble before adding more.
+\section*{AI-use statement}
+
+This project was built with AI assistance used as a tool under the author's
+direction, not as an author. The author selected the problem, made and locked
+every design decision, set the cost values and their ordering, wrote all public
+discussion contributions personally, and verified every reported number against
+the committed run artifacts.
+
+AI tools were used for: preparing research terms, search queries, and candidate
+communities and accounts to engage [tools:\ Claude, ChatGPT, Gemini]; studying the
+source papers [tool:\ NotebookLM]; scaffolding, writing, and repairing code,
+running the test harness, and executing commits [Claude and Claude Code]; and
+adversarial review passes of the draft [tools used, logged in
+\texttt{review-record.md}]. Per-decision provenance --- what the author set
+versus what a tool proposed --- is recorded at the point each decision was made
+in \texttt{build-log.md}.
+
+Every AI output was checked before use. Where a tool was confidently wrong, the
+error and its correction are recorded rather than propagated; these are logged in
+the ``Important AI errors'' section of \texttt{research-file.md}. Two are worth
+naming: a synthesis that recommended an architecture directly contradicting the
+locked design, and an unverified bound attributed to a mis-cited source, neither
+of which was carried into this paper.
+
+The author affirms that no conversation in the discussion record is fabricated;
+that every reported result comes from a real run of the committed code over the
+committed data; and that no reference is cited that the author did not read.
 \bibliographystyle{named}
 \bibliography{references}
 
