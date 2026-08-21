@@ -167,7 +167,7 @@ raises the flip point the belief had to clear.
 | chose | `hold`, margin **0.220** |
 | correct action | `escalate_notify` (cell `cold\|True` = 0) |
 | cost incurred | **3** — cell `hold[cold\|True]` |
-| flip point | `needs_human` ≥ 0.306 (belief was 0.20, short by 0.106) |
+| flip point | `needs_human` ≥ 0.305 (belief was 0.20, short by 0.105) |
 
 The lowest-cost miss available in the matrix. `hold` on a lead that is genuinely
 `cold` incurs 3 rather than 10, because holding a cold lead wastes little even
