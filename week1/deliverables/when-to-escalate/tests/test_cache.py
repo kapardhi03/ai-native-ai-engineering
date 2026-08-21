@@ -274,3 +274,71 @@ def test_assert_llm_only_rejects_an_unknown_provider(belief, make_settings):
 
 def test_assert_llm_only_passes_on_an_empty_cache(belief, make_settings):
     belief.assert_llm_only(make_settings())
+
+
+# --------------------------------------------------------------------------- #
+# Cache-only mode — a reproduction must not quietly become a fresh run
+# --------------------------------------------------------------------------- #
+
+def test_cache_only_serves_a_hit_without_calling_out(belief, make_settings, fake_openai):
+    rec = fake_openai(GOOD)
+    seed = make_settings(provider="openai", openai_api_key="sk-x",
+                         allow_rule_fallback=False)
+    belief.get_belief("case-1", "price?", settings=seed)
+    assert rec.call_count == 1
+
+    replay = make_settings(provider="openai", openai_api_key=None,
+                           allow_rule_fallback=False, cache_only=True)
+    b, m = belief.get_belief("case-1", "price?", settings=replay)
+    assert m.from_cache is True and rec.call_count == 1
+    assert b.needs_human == pytest.approx(GOOD["needs_human"])
+
+
+def test_cache_only_raises_on_a_miss_instead_of_generating(belief, make_settings, fake_openai):
+    """The whole point. Silently generating one belief mid-reproduction would mean
+    the run no longer reproduces anything, and nothing in the output would say so.
+    """
+    rec = fake_openai(GOOD)
+    s = make_settings(provider="openai", openai_api_key="sk-x",
+                      allow_rule_fallback=False, cache_only=True)
+    with pytest.raises(belief.BeliefSourceError, match="BELIEF_CACHE_ONLY"):
+        belief.get_belief("absent-case", "price?", settings=s)
+    assert rec.call_count == 0, "cache-only must make no provider call at all"
+
+
+def test_cache_only_miss_message_names_the_case_and_path(belief, make_settings):
+    s = make_settings(allow_rule_fallback=False, cache_only=True)
+    with pytest.raises(belief.BeliefSourceError) as exc:
+        belief.get_belief("absent-case", "price?", settings=s)
+    assert "absent-case" in str(exc.value)
+    assert str(s.cache_path) in str(exc.value)
+    assert "no entry" in str(exc.value)
+
+
+def test_cache_only_writes_nothing(belief, make_settings, fake_openai):
+    fake_openai(GOOD)
+    seed = make_settings(provider="openai", openai_api_key="sk-x")
+    belief.get_belief("case-1", "price?", settings=seed)
+    before = seed.cache_path.read_text()
+
+    replay = make_settings(allow_rule_fallback=False, cache_only=True)
+    belief.get_belief("case-1", "price?", settings=replay)
+    with pytest.raises(belief.BeliefSourceError):
+        belief.get_belief("absent", "x", settings=replay)
+    assert replay.cache_path.read_text() == before
+
+
+def test_cache_only_still_serves_a_stale_entry_by_default(belief, make_settings, fake_openai):
+    """Staleness policy is unchanged: reproducibility wins, with a warning. Only an
+    explicit refresh request turns a stale entry into a miss."""
+    fake_openai(GOOD)
+    seed = make_settings(provider="openai", openai_api_key="sk-x")
+    belief.get_belief("case-1", "price?", settings=seed)
+
+    replay = make_settings(allow_rule_fallback=False, cache_only=True)
+    _, m = belief.get_belief("case-1", "DIFFERENT message", settings=replay)
+    assert m.from_cache is True
+
+    with pytest.raises(belief.BeliefSourceError, match="different input"):
+        belief.get_belief("case-1", "DIFFERENT message", settings=replay,
+                          refresh_on_message_change=True)

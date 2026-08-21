@@ -260,3 +260,38 @@ def test_strict_mode_with_no_keys_at_all_raises(belief, make_settings):
 def test_no_keys_permissive_uses_keywords(belief, make_settings):
     _, meta = belief.get_belief("c", "price?", settings=make_settings(provider="auto"))
     assert meta.provider == "rule"
+
+
+# --------------------------------------------------------------------------- #
+# clipped() — keeping a belief off the endpoints
+# --------------------------------------------------------------------------- #
+
+def test_clipped_pulls_endpoints_inward(belief):
+    b = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": 0.0})
+    assert b.clipped().needs_human == pytest.approx(0.02)
+    b1 = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": 1.0})
+    assert b1.clipped().needs_human == pytest.approx(0.98)
+
+
+def test_clipped_leaves_interior_values_alone(belief):
+    for nh in (0.02, 0.2, 0.5, 0.9, 0.98):
+        b = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": nh})
+        assert b.clipped().needs_human == pytest.approx(nh)
+
+
+def test_clipped_does_not_touch_readiness(belief):
+    b = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": 0.0})
+    assert b.clipped().readiness == b.readiness
+
+
+def test_clipped_returns_a_new_belief(belief):
+    b = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": 0.0})
+    assert b.clipped() is not b
+    assert b.needs_human == 0.0, "clipped() must not mutate the receiver"
+
+
+def test_clipped_rejects_bad_bounds(belief):
+    b = belief.to_belief({"hot": .2, "warm": .3, "cold": .5, "needs_human": 0.5})
+    for floor, ceiling in ((0.6, 0.4), (-0.1, 0.9), (0.1, 1.5), (0.5, 0.5)):
+        with pytest.raises(ValueError):
+            b.clipped(floor, ceiling)

@@ -102,12 +102,20 @@ We test on 100 synthetic cases with cached language-model beliefs, comparing the
 cost-aware policy against the same policy with a uniform cost matrix and against
 three fixed-action baselines. The cost-aware policy reaches a mean cost of 1.72
 against 2.58 for the uniform-cost version, so the asymmetry does most of the
-work. Against a policy that escalates every message the result is close to a tie
+work --- though the uniform baseline turns out to select the same action as a plain
+$0.5$ threshold on all 100 cases, and reweighting the case set toward the design's
+own readiness prior narrows the gap from 0.86 to 0.07, so we report the direction of
+that result with more confidence than its magnitude. Against a policy that escalates
+every message the result is close to a tie
 on cost, 1.72 against 1.74, but the cost-aware policy reaches it while escalating
 43 times out of 100 rather than all 100, so the gain there is in human load, not
 cost. Every missed escalation traces to one cause: the belief under-estimated the
-needs-human probability rather than misreading readiness, and the model is
-under-confident on that marginal near the threshold, with an expected calibration error of 0.142. We
+needs-human probability rather than misreading readiness. Expected calibration error
+on that marginal is 0.142 (bootstrap 95\% CI $[0.100, 0.249]$), concentrated in the
+bins adjacent to the escalation threshold rather than the bin containing it;
+recalibrating the marginal in-sample halves the misses, from 16 to 8, and the
+residual 8 are traceable to the elicited probability taking only one-decimal values.
+We
 also report a failure the test set cannot produce by construction, a high-cost
 message dropped when it arrived batched with a routine one, observed in a live
 run. Code and data are available.
@@ -428,8 +436,18 @@ does not apply.}
 \label{tab:costs}
 \end{table}
 
-The costs are expert-set, not learned, and their \emph{ordering} is the
-load-bearing part, not the exact magnitudes. Two cells are worth stating
+The costs are expert-set, not learned. An earlier draft claimed their
+\emph{ordering} was the load-bearing part and not the exact magnitudes; a
+sensitivity sweep supports that for one cell and refutes it for another, so the
+claim is stated more narrowly here. Varying the false-assertion cost from 7 to 30,
+which preserves every ordering, leaves the decisions untouched at 16 misses and 43
+escalations throughout (mean realised cost still drifts, from 1.920 at 7 to 1.580 at
+30, via answer-to-hold substitution on cases that were not misses). The
+needless-notify cost is not like that. Sweeping it from 1 to 6, again preserving
+every ordering, moves the policy across almost its whole operating range: 1 miss and
+96 escalations at a cost of 1, 8 and 73 at 2, 16 and 43 at 3, 23 and 28 at 4, and 25
+and 23 at 5 or above. The reported operating point is a direct consequence of that
+one number's magnitude, and it was set by judgment. Two cells are worth stating
 because they are where the two-part belief does its work. When a lead is hot
 \emph{and} needs a human and the agent holds, the cost is 8, not 16: the two
 harms (the lead waits, no human arrives) overlap rather than stack, and pricing
@@ -476,12 +494,28 @@ both rows are flat across readiness. In the worked case $b_h = 0.30$ clears it
 by 0.069, which is why the agent escalates even though the belief is only
 modestly above the line.
 
+The precision of the fraction is misleading, however, and it is worth saying so
+before the results lean on it. The elicited $b_h$ takes only eight distinct values
+over the 100 cases, all at one decimal place, and none of them falls in
+$(0.2, 0.3]$. Every threshold in that interval therefore produces identical
+decisions on every case, and $3/13 \approx 0.231$ is one arbitrary point inside a
+band the measurement cannot resolve. Nothing in the results distinguishes it from
+$0.25$. The derivation is exact; what it is applied to is quantized to a tenth.
+
 This clean single threshold holds only when the runner-up action is
 \emph{answer}. When \emph{hold} is the competing action its row is not flat
-across readiness, so the threshold becomes readiness-dependent (it ranges from
-roughly 0.31 to 0.38 across the cases in the failure analysis). The policy is
-still a single $\arg\min$; it is only the \emph{reduced} one-dimensional
-threshold that shifts with which action is the alternative.
+across readiness, so the threshold becomes readiness-dependent, and the spread is
+much wider than the two hold cases in the failure analysis (which flip at 0.306
+and 0.373) would suggest. Solving $E[\textit{notify}] = E[\textit{hold}]$ at each
+case's actual readiness distribution puts the crossover anywhere in
+$[0.018, 0.500]$ on the 73 cases where it falls in $[0, 1]$ at all; on the other
+27 it is negative, meaning \emph{hold} never wins for any admissible $b_h$. At the
+pure readiness states the crossover is $-0.600$ (hot), $0.333$ (warm) and $0.500$
+(cold). So $3/13$ is the threshold for one specific pairwise comparison, not a
+single operating point for the policy. The policy is still a single $\arg\min$; it
+is only the \emph{reduced} one-dimensional threshold that shifts with which action
+is the alternative, and quoting $3/13$ alone understates how much of the decision
+boundary depends on readiness.
 
 \subsection{Baseline}
 The baseline is the same decision rule run over an identical belief with a
@@ -503,8 +537,18 @@ messages that suspect the agent is a bot, competitors fishing for pricing,
 captionless media, over-sharers, polite time-wasters, and abusive or off-topic
 messages. The distribution is deliberately weighted toward the archetypes where a
 wrong action is expensive rather than made uniform, and it is skewed toward
-harder cases: 42 of the 100 truly need a human, well above what a live inbox
-would show, so that recall on missed escalations is measurable at all.
+harder cases: 42 of the 100 truly need a human, chosen so that recall on missed
+escalations is measurable at all. How far that is above a live inbox is not known
+here --- no measured base rate for this channel is available to the author --- so
+the 42\% should be read as a design choice made for measurability, not as a
+calibrated departure from a known population.
+
+The readiness distribution of the case set is also worth stating explicitly,
+because it does not match the prior the belief module itself carries. That prior is
+$(\text{hot}, \text{warm}, \text{cold}) = (0.02, 0.13, 0.85)$, whereas the true
+labels in the case set are 23 hot, 38 warm and 39 cold. The set is not a sample
+from the population the design assumes; Section~\ref{sec:results} reports what
+happens when the results are reweighted toward that prior.
 
 The labels are the author's judgment of the intended state, not outcomes observed
 in production. This is stated plainly as a limitation in
@@ -538,6 +582,19 @@ constraint, and the expected-cost machinery fixed and removes only the asymmetry
 This isolates what cost-awareness buys. Three fixed-action baselines are also
 reported for reference: always answer, always ask, and always escalate-notify.
 
+One implementation detail changes a reported number, so it is disclosed here
+rather than left to the failure analysis. Exact ties in expected cost were
+originally resolved in the order the five actions are declared, which resolves
+toward \emph{answer} --- the action with the largest worst-case cost, and the one a
+policy premised on the expense of false assertion should reach for last. Ties are
+now resolved safest-first, in an order derived from the cost matrix itself by
+worst-case cost (\texttt{tie\_break\_order}) rather than hand-written. The run
+reported below deliberately retains the original order, via the
+\texttt{-}\texttt{-legacy-tie-break} flag, so the committed result artifact stays
+reproducible action for action. Under the corrected default exactly one of the 100
+decisions changes and the mean cost falls from 1.72 to 1.65;
+Section~\ref{sec:failure} gives the case and the arithmetic.
+
 \subsection{Metrics}
 Accuracy alone would hide the thing the design is about, so the run reports mean
 realised cost per case, the number of missed escalations (a case that needed a
@@ -567,7 +624,20 @@ always-answer     & 3.40 & 34 & 1.000 & 0.190 & 8 \\
 \end{tabular}
 \caption{Mean cost per case, missed escalations, escalation precision and recall,
 and number of escalations, over 100 cases. Lower cost and fewer misses are
-better. The cost-aware policy records zero hard-constraint violations.}
+better. The cost-aware row is the legacy tie-break configuration described in
+Section~\ref{sec:method}; under the corrected default its cost is 1.65 and every
+other entry in the row is unchanged. No policy records a hard-constraint
+violation, including the fixed-action
+baselines --- the constraint forbids only \emph{answer}, and on all 8 restricted
+cases the cost-aware policy escalates on cost grounds before feasibility is
+consulted, so the constraint never changed a decision. Zero violations here is
+therefore not evidence that the constraint mechanism works; it is untested.
+\emph{always-answer} shows precision 1.000 on 8 escalations, which is an artifact:
+the policy never escalates, and those 8 are the restricted cases where the
+constraint removed \emph{answer}, leaving the fixed-action policy to fall back to
+escalate-notify by construction rather than by any comparison of costs. All
+8 happen to need a human, so the precision is 8/8 on a denominator the policy did
+not choose. It should not be read as the baseline discriminating well.}
 \label{tab:results}
 \end{table}
 
@@ -582,6 +652,43 @@ losses are small and its wins are large. Almost every swap it makes is answer to
 hold or answer to escalate-notify, trading many small costs of two or three for a
 few avoided false assertions of ten. The point of the design is not to be right
 more often but to be wrong more cheaply.
+
+\subsection{What the baseline actually is}
+One further check weakens how much that gap can be attributed to the machinery.
+The uniform baseline selects the same action as a plain threshold of $0.5$ on
+$b_h$ --- ignoring readiness, the cost matrix, and the expected-cost computation
+entirely --- on 100 of the 100 cases. Its behaviour is fully described by one
+number. The cost-aware policy is not reducible in the same way, because
+\emph{hold} is chosen on 27 cases and that choice does depend on readiness, but the
+comparison in Table~\ref{tab:results} is between a readiness-sensitive rule and a
+$0.5$ threshold, and part of the reported gap is the distance from $0.5$ to
+$3/13$ rather than the asymmetry as such.
+
+A threshold sweep separates the two contributions, and it does not go cleanly. No
+threshold on $b_h$ reproduces the cost-aware policy's 43 escalations: because the
+elicited values are quantized, the sweep jumps from 29 escalations at $t = 0.35$
+(23 misses, cost 2.600) to 46 at $t = 0.25$ (13 misses, cost 1.810). The
+cost-aware policy's 16 misses at 43 escalations is therefore not straightforwardly
+better than a tuned threshold at matched load, because matched load is not
+attainable; the nearest bracketing thresholds are worse on one axis and better on
+the other. Tuning a threshold on the development half by realised cost selects
+$t = 0.00$ --- escalate everything --- at cost 1.740, which recovers the
+always-notify result rather than the cost-aware one.
+
+\subsection{Two actions that are never used}
+Of the five actions, the cost-aware policy selects only three across all 100
+cases: \emph{answer} 30 times, \emph{hold} 27, \emph{escalate-notify} 43.
+\emph{Ask} and \emph{escalate-pause} are selected zero times. This is a property of
+the matrix rather than of the cases. \emph{Ask} costs 2 when no human is needed
+against 0 for \emph{answer}, and 4 when one is needed against 0 for
+\emph{escalate-notify}, so it is dominated at both ends and can only win in a
+narrow middle band that the quantized beliefs never land in. \emph{Escalate-pause}
+is dominated by \emph{escalate-notify} in every column. The paper describes a
+five-action set, but every reported number comes from a three-action policy, and
+the two unused actions are untested by this experiment. The myopia limitation in
+Section~\ref{sec:limitations} compounds this: a one-step rule cannot price
+\emph{ask}'s payoff, so the action most obviously suited to an ambiguous inbound
+message is both unpriced and unused.
 
 \subsection{The comparison that is a tie, not a win}
 Against always-notify, which escalates every message, the cost result is close to
@@ -612,13 +719,21 @@ this figure cannot stand as out-of-sample evidence, and it is not read as such.
     \centering
     \includegraphics[width=\columnwidth]{reliability-needs-human.pdf}
     \caption{Reliability of the \texttt{needs\_human} marginal over all 100 cases,
-    ECE 0.142. Points above the diagonal are under-confident: the belief reports a low
-    probability where the observed frequency is high. The vertical line is the
-    escalation threshold $b_h^{\star} = 3/13 \approx 0.231$. The two bins straddling
-    it are under-confident by 0.300 and 0.288, which is the mechanism behind all 16
-    missed escalations. The 0.7--0.8 bin is over-confident by 0.367 on only 6 cases,
-    so the belief is not uniformly under-confident; bins 0.5--0.7 are empty, hence the
-    break in the curve.}
+    ECE 0.142 (bootstrap 95\% CI $[0.100, 0.249]$, median 0.171). Points above the
+    diagonal are under-confident: the belief reports a low probability where the
+    observed frequency is high. Marker area is proportional to bin count and bars
+    are Wilson 95\% intervals, because the bins hold between 4 and 35 cases and
+    most are individually consistent with perfect calibration. The vertical line is
+    $b_h^{\star} = 3/13 \approx 0.231$; the shaded band is the interval of
+    thresholds that decide identically, since the elicited marginal takes only
+    one-decimal values and no case falls in $(0.2, 0.3]$. The bin that
+    \emph{contains} the threshold, 0.2--0.3, is the largest ($n = 35$) and is very
+    slightly over-confident (predicted 0.200, observed 0.171, CI $[0.081, 0.327]$).
+    Its neighbours at 0.1--0.2 and 0.3--0.4 are under-confident by 0.300 and 0.288.
+    The 0.7--0.8 bin reads over-confident by 0.367 on 6 cases, but its interval
+    $[0.097, 0.700]$ covers the predicted value, so the belief is not uniformly
+    under-confident and that bin is not evidence of the reverse. Bins 0.5--0.7 are
+    empty, hence the break in the curve.}
     \label{fig:reliability}
     \end{figure}
     
@@ -626,15 +741,34 @@ Every one of the 16 missed escalations came from the same place: the belief
 under-estimated the needs-human probability, not the readiness. On all 16, the
 needs-human estimate was 0.30 or below against a true label of needing a human,
 while the readiness argmax on those same cases was spread across cold, hot, and
-warm and was often correct and confident. The belief is measurably
-under-confident on the needs-human marginal, with an expected calibration error
-of 0.142 and reliability bins (Figure~\ref{fig:reliability}) that read low against observed frequency in exactly
-the range where the escalation threshold sits (for example, a predicted 0.10
-against an observed 0.40, and a predicted 0.30 against an observed 0.588). Because
-the failures trace to one miscalibrated marginal rather than to the two hidden
-components interfering, they are evidence for the independent two-part belief
-rather than against it, and they point at recalibration as the fix rather than a
-redesign of the state.
+warm and was often correct and confident. The belief reads under-confident on the
+needs-human marginal, with an expected calibration error of 0.142 (bootstrap 95\%
+CI $[0.100, 0.249]$; 0.168 on the development half, 0.184 on test), and reliability
+bins (Figure~\ref{fig:reliability}) that read low against observed frequency near
+the escalation threshold (for example, a predicted 0.10 against an observed 0.40,
+and a predicted 0.30 against an observed 0.588).
+
+Two qualifications belong with that number. First, the bin that actually
+\emph{contains} $3/13$ is not the under-confident one: at 0.2--0.3, the largest bin
+at $n = 35$, predicted 0.200 against observed 0.171, the belief is very slightly
+\emph{over}-confident, and its Wilson interval $[0.081, 0.327]$ covers the
+predicted value. The under-confidence is in the neighbouring bins. So
+``under-confident exactly where the threshold sits'' is not the right description;
+the mechanism is that a large mass of cases sits pinned at $b_h = 0.20$, just below
+the line, and 35\% of the case set turns on whether that single elicited value is
+right. Second, with 4 to 35 cases per bin most individual bins are consistent with
+perfect calibration, so the ECE point estimate carries most of the evidential
+weight here and its interval is wide.
+
+Because the failures trace to the needs-human marginal rather than to the readiness
+marginal, recalibrating that marginal is the natural first fix, and
+Section~\ref{sec:failure} reports what it recovers. This is weaker than the claim
+an earlier draft made. That the misses localise to one marginal is consistent with
+the independent two-part belief, but it is not evidence \emph{for} independence: the
+experiment records only the two marginals, never the joint, so it cannot detect the
+two components interfering even if they did. Testing independence would require
+eliciting $P(s, h)$ directly and comparing it against $P(s)\,P(h)$, which this run
+does not do.
 \section{Failure analysis}
 \label{sec:failure}
 
@@ -664,32 +798,64 @@ Table~\ref{tab:failures} lists five misses and the mode each one represents.
 \toprule
 Case & Cost & Mode \\
 \midrule
-a11-repeated-097 & 10 & tie-break, not the cost model \\
+a11-repeated-097 & 10 & tie-break, not the cost model; since corrected \\
 a04-booking-042 & 10 & readiness right, needs-human wrong \\
-a02-deep-015 & 10 & missed the threshold by 0.031 \\
+a02-deep-015 & 10 & one quantization step below the line \\
 a03-followup-024 & 4 & hold looked cheap, readiness also off \\
 a10-persistent-091 & 3 & cheapest miss the matrix allows \\
 \bottomrule
 \end{tabular}
-\caption{Five missed escalations, one per failure mode.}
+\caption{Five missed escalations, one per failure mode. All five are from the
+reported run. The first has since been fixed in the implementation and is retained
+because the reported run predates the fix; the other four remain open.}
 \label{tab:failures}
 \end{table}
 
 The three that realise the full cost of 10 fail in different ways.
 \texttt{a04-booking-042} is the cleanest illustration of the shared cause: the
 readiness estimate was right and confident, and only the needs-human number
-failed, so nothing about readiness could have saved it. \texttt{a02-deep-015}
-missed the escalation threshold by 0.031, a case that recalibration would very
-likely recover, since it sits just below the line. \texttt{a11-repeated-097} is
-the worst of the three, and it is worst for a reason that is not the cost number.
-Its belief is the furthest from the flip point of any miss: it needed a
-needs-human estimate above 0.50 and the model reported 0.00, so recalibration
-would not save it the way it would save the near-threshold cases. And it was not
-decided by the cost model at all. Two actions came out with an expected cost of
-exactly 0.000, and the tie was broken by the fixed ordering of the action list
-rather than by any cost comparison. In the true state, holding would have cost 3,
-so 7 of its 10 realised points are attributable to an implementation detail, the
+failed, so nothing about readiness could have saved it. \texttt{a02-deep-015} sits
+one quantization step below the line: its elicited $b_h$ is 0.20 against a threshold
+of 0.2308. Describing this as missing by 0.031, as an earlier draft did, reads the
+gap as a small numerical shortfall, which overstates how close the call was. The
+belief cannot express 0.24; the next value it can emit is 0.30. Recovering this case
+requires moving it a full decimal step, not nudging it by three hundredths, and the
+same is true of the 35 cases that share its $b_h = 0.20$. \texttt{a11-repeated-097}
+is the worst of the three, for a reason that is not the cost number --- and, unlike
+the other four cases in Table~\ref{tab:failures}, it is not an open failure: its
+cause was identified and repaired, and it is retained here because the reported run
+predates the repair. Its belief is the furthest from the flip point of any miss: it
+needed a needs-human estimate above 0.50 and the model reported 0.00, so
+recalibration would not save it the way it would save the near-threshold cases. And
+it was not decided by the cost model at all. Two actions came out with an expected
+cost of exactly 0.000, and the tie was broken by the fixed ordering of the action
+list rather than by any cost comparison. In the true state, holding would have cost
+3, so 7 of its 10 realised points were attributable to an implementation detail, the
 tie-break, rather than to a property of the policy.
+
+That detail has since been repaired, as Section~\ref{sec:method} notes. Ties now
+resolve safest-first, in an order derived from the cost matrix by worst-case cost
+(\texttt{tie\_break\_order}) rather than hand-written, which gives
+\emph{escalate-notify} (worst case 3) $<$ \emph{ask} (4) $<$
+\emph{escalate-pause} (6) $<$ \emph{hold} (8) $<$ \emph{answer} (10). The old
+ordering resolved indifference toward \emph{answer}, the action with the largest
+downside, which is the opposite of what a policy premised on the expense of false
+assertion should do. Exactly one decision on the reported case set changes:
+\texttt{a11-repeated-097} moves from \emph{answer} to \emph{hold}, and the mean cost
+falls from 1.720 to 1.650 --- the 7 points this section predicted, and no others.
+Miss count and escalation count are unchanged at 16 and 43, since \emph{hold} and
+\emph{answer} are both non-escalating actions. This is also the only decision the
+correction \emph{could} change: \texttt{a11-repeated-097} is the one case in the 100
+where two feasible actions come out at exactly equal expected cost, and a tie-break
+is consulted nowhere else. The uniform baseline is unaffected, for a structural
+reason worth stating --- with every non-zero cost set to one, all five actions have
+worst-case cost 1, so the derived order degenerates to the declaration order and the
+baseline's 2.58 is identical under both rules. Table~\ref{tab:results}
+reports the pre-fix numbers, because \texttt{results/run.json} was generated before
+the change and is kept as the artifact the reported numbers are checked against;
+\texttt{run\_policies.py -}\texttt{-legacy-tie-break} reproduces it exactly, action
+for action on all 100 cases, so those numbers stay verifiable while the default path
+uses the corrected rule.
 
 The two cheaper misses show why not every miss is a false assertion.
 \texttt{a03-followup-024} and \texttt{a10-persistent-091} were held rather than
@@ -698,6 +864,30 @@ is hold against escalate-notify, not answer against escalate-notify, and because
 the hold row is not flat across readiness their thresholds are readiness-dependent
 rather than the clean 3/13 of the answer cases. Reporting them at their true cost,
 rather than rounding every miss up to 10, is what keeps the miss total honest.
+
+\subsection{What recalibration actually recovers}
+Since the diagnosis above points at the needs-human marginal, it can be tested
+directly rather than left as a prediction. Replacing each elicited $b_h$ with the
+observed frequency of its reliability bin --- histogram binning, fit on the same
+100 cases, so this is an optimistic in-sample ceiling and not a held-out result ---
+and re-running the policy gives mean cost 1.250 against 1.720, and 8 misses against
+16.
+
+The composition of that change matters more than the totals. Of the 16 original
+misses, 9 are fixed and 7 survive. The survivors are the cases the diagnosis
+already flagged as out of reach: 6 sit at $b_h = 0.20$, in the bin whose observed
+frequency (0.171) is itself below the threshold, so recalibration moves them the
+wrong way, and 1 is \texttt{a11-repeated-097} at $b_h = 0.00$. Recalibration also
+\emph{creates} one new miss: \texttt{a06-frustrated-055}, at $b_h = 0.70$, is pulled
+down into the over-confident 0.7--0.8 bin and switches from
+\emph{escalate-notify} to \emph{hold}. So the honest count is 9 fixed, 7 surviving,
+1 created.
+
+The cost is paid in human load. Escalations rise from 43 to 60, precision falls from
+0.605 to 0.567, and recall rises from 0.619 to 0.810. Recalibration does not make
+the policy better on every axis; it buys recall with load, and 8 misses remain that
+no amount of recalibrating this marginal removes. That floor, not the halving, is
+the finding.
 
 
 \subsection{A failure the test set cannot show}
@@ -730,9 +920,15 @@ measurable because of that. The clearest case is recall on missed escalations. I
 a live inbox there is no label for the lead who needed a human and did not get
 one, so escalation recall cannot be measured at all; it is measurable here only
 because the cases are labeled by construction. The needs-human base rate of 42\%
-is likewise inflated well above what a real inbox would show, chosen so that
-recall is estimable, which means the precision and recall reported here will not
-transfer to production. The readiness and needs-human labels are the author's
+was chosen so that recall is estimable. Earlier drafts described it as inflated
+above a real inbox; that comparison is withdrawn, because no measured base rate for
+this channel exists to compare against. What can be said without a source is
+narrower and still sufficient: the rate was set for measurability rather than
+sampled, so the precision and recall reported here are properties of this case set
+and should not be expected to transfer to production, in either direction. The
+readiness distribution is off the design's own prior in the same way: the belief
+module assumes 85\% cold, the case set is 39\% cold.
+The readiness and needs-human labels are the author's
 judgment of what each message was written to represent, not outcomes observed from
 real leads, so they carry the author's assumptions about intent.
 
@@ -748,11 +944,45 @@ Two limitations are structural to the method rather than to the data. The policy
 is myopic, so it undervalues the ask action, whose payoff is a better belief on
 the next turn that a one-step rule cannot price; the honest handling of the ask
 action would compute its one-step value of information, which this design does not
-do. And the hard constraint that removes the answer action on restricted cases is
-treated here as observable and error-free, because a flag on the case says the
-message asks for legal or land documents. A production detector for that condition
+do. Section~\ref{sec:results} shows the consequence is not hypothetical:
+\emph{ask} is selected zero times, as is \emph{escalate-pause}, so the reported
+results exercise three of the five actions. And the hard constraint that removes
+the answer action on restricted cases is treated here as observable and
+error-free, because a flag on the case says the message asks for legal or land
+documents. A production detector for that condition
 would carry its own false-positive and false-negative rates, which this experiment
-does not model.
+does not model. Sweeping a synthetic false-negative rate on that flag from 0 to 0.5
+changes nothing --- cost stays at 1.720 and misses at 16 --- but that is not
+reassurance, it is a restatement of the fact that the constraint never bound: on all
+8 restricted cases the policy already escalates on cost grounds, so dropping the flag
+changes no decision. A detector's error rates would matter on restricted cases the
+cost model does \emph{not} already catch, and this case set contains none.
+
+A third structural limitation is the granularity of the belief itself. The elicited
+$b_h$ takes only 8 distinct values across the 100 cases, every one at a single
+decimal place, distributed $\{0.0{:}\,4,\ 0.1{:}\,15,\ 0.2{:}\,35,\ 0.3{:}\,17,\
+0.4{:}\,6,\ 0.7{:}\,6,\ 0.8{:}\,5,\ 0.9{:}\,12\}$. The language model is being asked
+for a probability and is returning something closer to an ordinal grade. Three
+consequences follow, and all three are visible in the results: the threshold $3/13$
+cannot be distinguished from any other value in $(0.2, 0.3]$; 35\% of the case set
+rests on one elicited value, $b_h = 0.20$, sitting just below the line; and
+recalibration cannot rescue those 35 cases, because it maps a bin to a single
+number and that number (0.171) is also below the line. A finer-grained elicitation
+is the prerequisite for most of the improvements this paper proposes, and it is not
+tested here. Relatedly, the beliefs come from a single unpinned model
+(\texttt{gpt-4o-mini}) elicited once per case; no dated snapshot is recorded, no
+repeat elicitation measures the variance of the belief itself, and every number in
+the paper is conditional on that one draw.
+
+Because the case set's readiness distribution does not match the prior the design
+assumes, the reported means are sensitive to reweighting. Importance-weighting each
+case toward the module's own prior (weights: hot 0.087, warm 0.342, cold 2.180)
+moves the cost-aware policy from 1.720 to 1.456 and the uniform baseline from 2.580
+to 2.526 --- the gap narrows from 0.86 to 0.07. It also reverses the comparison
+against always-notify, which moves from 1.740 to 1.834. The direction of the main
+result survives reweighting; its magnitude does not. Since the prior itself is
+expert-set rather than measured, neither weighting is the authoritative one, and the
+spread between them is the honest statement of what the case set can support.
 
 Finally, one whole class of failure is invisible to the test set by construction.
 As Section~\ref{sec:failure} describes, a high-cost signal batched with a routine
@@ -794,21 +1024,31 @@ rule but an honest account of what it buys. Making the cost matrix asymmetric
 cuts mean cost by a third against the same rule without that asymmetry. Against a
 policy that simply escalates everything, it does not cut cost at all, and the
 paper says so; what it buys there is reaching the same cost while escalating fewer
-than half as often. Every missed escalation traces to one miscalibrated marginal
-rather than to any confusion between the two hidden components, which is evidence
-for the two-part belief and points at recalibration rather than redesign.
+than half as often. Every missed escalation traces to the needs-human marginal
+rather than to the readiness marginal, which points at recalibration rather than
+redesign --- though, as Section~\ref{sec:results} notes, that localisation is
+consistent with the two-part belief without being evidence for it, since the
+experiment never observes the joint distribution.
 
 Three questions follow directly from these results.
 
-The first is calibration. If every miss comes from an under-confident needs-human
-estimate, then recalibrating that one marginal, rather than changing anything
-about the policy or the state, should recover most of the misses. The
-near-threshold cases in the failure analysis suggest this would work; the case
-whose belief was far from the threshold suggests it has a floor. Measuring where
-that floor sits is the most immediate next step.
+The first is calibration, and it is the one this version can partly answer.
+Recalibrating the needs-human marginal in-sample halves the misses, from 16 to 8,
+and cuts mean cost from 1.720 to 1.250 --- but the composition is 9 fixed, 7
+surviving, and 1 newly created, and escalations rise from 43 to 60 to pay for it.
+The floor is real and it has a specific cause: 6 of the 7 survivors sit at
+$b_h = 0.20$, in a bin whose observed frequency is also below the threshold, so no
+mapping of that bin to a single value can rescue them. The floor is therefore set
+by the granularity of the elicitation, not by the calibration method. The next step
+is a finer-grained belief and a held-out recalibration fit, since the numbers here
+are an in-sample ceiling.
 
 The second is the ask action. A myopic policy cannot price the value of asking,
-because that value is a better belief next turn. Scoring the ask action by its
+because that value is a better belief next turn. This experiment makes the cost of
+that concrete: \emph{ask} is dominated by \emph{answer} when no human is needed and
+by \emph{escalate-notify} when one is, so it is selected zero times out of 100, as
+is \emph{escalate-pause}. The five-action set is really a three-action set in
+practice. Scoring the ask action by its
 one-step value of information, and testing whether it then earns its place against
 hold and escalate, would close the gap the current design leaves open, and would
 say whether the action is genuinely useful or merely unpriced.

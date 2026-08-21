@@ -164,6 +164,24 @@ class Belief:
         """Highest-probability readiness state. Ties break in READINESS_LABELS order."""
         return max(READINESS_LABELS, key=lambda k: self.readiness[k])
 
+    def clipped(self, floor: float = 0.02, ceiling: float = 0.98) -> "Belief":
+        """The same belief with needs_human held away from the endpoints.
+
+        An elicited 0.00 is not a probability, it is a refusal to entertain the
+        possibility. It makes the expected cost of `answer` exactly zero however
+        severe the matrix is, and no multiplicative recalibration can lift it —
+        which is why the one case at 0.00 in the reported run survives the fix
+        proposed in the paper's conclusion.
+
+        Not applied on the read path: results/run.json was produced without it and
+        must stay reproducible. Callers opt in, and the effect is measured in
+        experiments/robustness.py.
+        """
+        if not 0.0 <= floor < ceiling <= 1.0:
+            raise ValueError(f"bad clip bounds ({floor}, {ceiling})")
+        return Belief(readiness=dict(self.readiness),
+                      needs_human=min(ceiling, max(floor, self.needs_human)))
+
 
 # --------------------------------------------------------------------------- #
 # Provenance — separate, so Belief stays the paper's object exactly.
@@ -360,6 +378,18 @@ def get_belief(
             )
 
     logger.info("Cache miss for case_id=%s; generating a belief.", case_id)
+    if settings.cache_only:
+        raise BeliefSourceError(
+            f"BELIEF_CACHE_ONLY=true but case_id={case_id!r} is not served by the "
+            f"cache at {settings.cache_path}"
+            + (" (the entry exists but was built from different input, and "
+               "refresh_on_message_change=True was requested)"
+               if entry is not None else " (no entry)")
+            + ". Cache-only mode will not generate a belief, because a run that "
+              "silently mixed fresh beliefs into a reproduction would no longer "
+              "reproduce anything. Either restore the committed cache, or unset "
+              "BELIEF_CACHE_ONLY and supply an API key to regenerate."
+        )
     belief, provider_name = _generate_belief(message, settings, context)
 
     meta = BeliefMeta(

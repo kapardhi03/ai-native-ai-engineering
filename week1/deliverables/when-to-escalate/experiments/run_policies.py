@@ -120,7 +120,7 @@ def expected_calibration_error(pairs, bins: int = 10) -> dict:
 # The run
 # --------------------------------------------------------------------------- #
 
-def run(settings, cases, allow_non_llm: bool) -> dict:
+def run(settings, cases, allow_non_llm: bool, legacy_tie_break: bool = False) -> dict:
     rows, non_llm = [], 0
 
     for case in cases:
@@ -144,7 +144,8 @@ def run(settings, cases, allow_non_llm: bool) -> dict:
         }
 
         for name, matrix in POLICIES.items():
-            decision = costs_mod.choose_action(b, constraints, matrix=matrix)
+            decision = costs_mod.choose_action(
+                b, constraints, matrix=matrix, legacy_tie_break=legacy_tie_break)
             row["decisions"][name] = {
                 "action": decision.action,
                 "realised_cost": realised_cost(decision.action, case["labels"]),
@@ -271,6 +272,12 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true",
                     help="offline keyword beliefs; output is marked NOT REPORTABLE")
     ap.add_argument("--split", choices=("dev", "test"), help="restrict the run")
+    ap.add_argument("--legacy-tie-break", action="store_true",
+                    help="resolve exact cost ties in ACTIONS order (toward `answer`) "
+                         "instead of safest-first. Reproduces the committed "
+                         "results/run.json and the paper's Table 2, which were "
+                         "generated before the tie-break was corrected; the "
+                         "difference is one case and 0.07 mean cost.")
     ap.add_argument("--out", type=Path, default=RESULTS_DIR)
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args()
@@ -300,7 +307,8 @@ def main() -> int:
     logger.info("Loaded %d cases from %s", len(cases), CASES_PATH.name)
 
     try:
-        result = run(settings, cases, allow_non_llm=args.dry_run)
+        result = run(settings, cases, allow_non_llm=args.dry_run,
+                     legacy_tie_break=args.legacy_tie_break)
     except belief_mod.BeliefSourceError as exc:
         print(f"\nRun refused:\n\n  {exc}\n", file=sys.stderr)
         return 2
