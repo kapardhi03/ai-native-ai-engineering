@@ -1,14 +1,5 @@
 # Build Log
 
-> **Working record, not a graded deliverable.** Same status as `PLAN.md` — nobody
-> reviews this file. It exists so every design decision in this project has a
-> written reason attached to it, recorded when the decision was made rather than
-> reconstructed afterwards.
->
-> **This is not `review-record.md`.** That file is reserved for the three formal
-> AI reviews of the finished project. This one is the running build. Keep them
-> separate.
-
 ## How to read this
 
 One row per decision. Never edit a row after the fact — if a decision is
