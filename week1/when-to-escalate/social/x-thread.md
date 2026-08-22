@@ -1,22 +1,23 @@
-# X Thread — draft
+Published: https://x.com/kapardhi200903/status/2090948515669381337?s=20
 
-## Problem statement (reference, not the post text)
+Built a small agent this week for a problem I hit in production: a lead messages you and you can't tell if they're a real buyer, a competitor, or a bot. Answer, ask, hold, or escalate to a human?
 
-The agent observes an inbound message from a sales lead. It must
-select one action from {`answer`, `ask`, `hold`, `escalate_notify`,
-`escalate_pause`} because the lead's true intent and buying-readiness are not
-known. `ask` is a qualifying question rather than an answer; `escalate_notify`
-tells a human while the conversation continues; `escalate_pause` stops the agent
-and hands over. They carry different costs (build decision 25).
+Every wrong choice costs a different amount. Most agents treat them as equal.
+The approach: instead of one confidence score, hold a two-part belief, readiness (hot/warm/cold) and a separate needs-human probability, then pick the action with the lowest expected cost, where a missed escalation is priced far above a needless one.
+Then I spent most of the week trying to break my own result.
 
----
+The cost-blind baseline I was beating? Turned out to be just a 0.5 threshold in disguise. So part of the "win" is less than it looks. Said so in the writeup.
+Against a policy that just escalates everything, my agent doesn't win on cost at all.
 
-<!-- Four posts. One idea each. No numbers that are not in results/. -->
+What it buys is human load: same expected cost, but 43 escalations out of 100 instead of all 100.
+Every missed escalation came from one under-confident probability. But recalibrating it only halved the misses.
+The rest survive because the model emits probabilities at one decimal place, and 35% of cases sit pinned at 0.2, just under the line.
+Two of the five actions were selected zero times in 100 cases. The five-action design is a three-action policy in practice. I report that instead of hiding it.
+It's synthetic data, so none of the precision/recall transfers to a live inbox, and I'm clear about that throughout.
 
-## 1. Problem
+Open question for anyone running these in production: where does a myopic one-step cost policy break in ways synthetic tests can't show?
+Kaps
+@kapardhi200903
+Code + writeup:  https://github.com/kapardhi03/cost-aware-escalation-agent/tree/main/week1/when-to-escalate
 
-## 2. Test
-
-## 3. Result
-
-## 4. Open question
+#AIagents #LLM #MachineLearning #humanintheloop
