@@ -1,13 +1,5 @@
 # When to Escalate - Project
 
-This folder holds a full week's project: the research file, the record of public
-discussions, the agent and probability-model decision records, the synthetic test
-harness and its results, the AI review record, the LaTeX preprint, and the two
-social posts.
-
-Still outstanding: both social posts. The layout below says so rather than
-implying otherwise.
-
 ## Paper
 
 **When to Escalate: A Cost-Aware Belief Policy for Conversational Agents Under
