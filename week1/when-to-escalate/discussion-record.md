@@ -1,11 +1,5 @@
 # Discussion Record
 
-Every public contribution goes in this table: Reddit and X, one row per contribution.
-
-> A link on its own does not complete the task. A row is done only when it says what
-> I contributed, what a human actually answered, what I said back, and what changed
-> because of it. If nothing changed, write "no change" and why. An empty cell is not
-> an answer.
 
 ## Corrections
 
