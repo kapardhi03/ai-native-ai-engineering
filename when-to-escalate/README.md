@@ -71,7 +71,7 @@ No API key is needed and no network call is made. The belief cache in
 every belief from it and **errors on a miss** rather than quietly generating a fresh
 one.
 
-Steps 2–5 run from this directory (`week1/when-to-escalate`). Steps 1
+Steps 2–5 run from this directory (`when-to-escalate`). Steps 1
 and 6 run from the repository root, because the virtualenv and `requirements.txt`
 live there; each step says which.
 
@@ -180,7 +180,7 @@ verified; the render is not, on a machine without matplotlib.
 ### 6. Tests (from the repository root)
 
 ```bash
-./.venv/bin/python -m pytest week1/when-to-escalate -q
+./.venv/bin/python -m pytest when-to-escalate -q
 ```
 
 337 tests, all passing. They cover the cost matrix and the hard constraint

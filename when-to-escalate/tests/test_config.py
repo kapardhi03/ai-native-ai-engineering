@@ -45,7 +45,7 @@ def test_keyword_scoring_must_be_opted_into(config, monkeypatch):
 
 
 def test_repo_root_contains_this_project(config):
-    assert (config.find_repo_root() / "week1").is_dir()
+    assert (config.find_repo_root() / "when-to-escalate").is_dir()
 
 
 def test_repo_root_falls_back_without_git(config, tmp_path):
@@ -230,7 +230,7 @@ def test_describe_marks_missing_keys_and_blocked_fallback(config, monkeypatch):
 # Path resolution — the bug that would silently split the cache in two
 # --------------------------------------------------------------------------- #
 
-REL = "week1/when-to-escalate/data/belief_cache.json"
+REL = "when-to-escalate/data/belief_cache.json"
 
 
 def test_relative_path_is_independent_of_cwd(config, monkeypatch, tmp_path):

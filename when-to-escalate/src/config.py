@@ -61,7 +61,7 @@ DEFAULT_PROVIDER = AUTO_PROVIDER
 DEFAULT_ALLOW_RULE_FALLBACK = False
 DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
 DEFAULT_GOOGLE_MODEL = "gemini-2.0-flash"
-DEFAULT_CACHE_PATH = "week1/when-to-escalate/data/belief_cache.json"
+DEFAULT_CACHE_PATH = "when-to-escalate/data/belief_cache.json"
 
 # Reproduction mode. The committed cache covers every case in data/cases.json, so
 # re-running the reported experiment needs no API key and makes no network call --
@@ -88,14 +88,14 @@ def find_repo_root(start: Optional[Path] = None) -> Path:
     """Walk upward looking for the .git directory.
 
     Falls back to the known depth of this file inside the repo
-    (week1/when-to-escalate/src/config.py -> 3 levels up) so an
+    (when-to-escalate/src/config.py -> 2 levels up) so an
     exported copy without .git still resolves sanely instead of raising.
     """
     here = Path(start if start is not None else __file__).resolve()
     for candidate in (here, *here.parents):
         if (candidate / ".git").exists():
             return candidate
-    fallback = Path(__file__).resolve().parents[3]
+    fallback = Path(__file__).resolve().parents[2]
     logger.debug("No .git found; falling back to %s as repo root.", fallback)
     return fallback
 

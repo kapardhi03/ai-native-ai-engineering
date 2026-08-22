@@ -39,16 +39,16 @@ most useful thing the experiment produced, and it's written up case by case.
 ## Where things are
 
 Everything is under
-[`week1/when-to-escalate/`](week1/when-to-escalate/).
+[`when-to-escalate/`](when-to-escalate/).
 
 | | |
 | --- | --- |
-| the policy, belief, and cost matrix | [`src/costs.py`](week1/when-to-escalate/src/costs.py), [`src/belief.py`](week1/when-to-escalate/src/belief.py) |
-| the run every number above comes from | [`results/run.md`](week1/when-to-escalate/results/run.md), [`results/run.json`](week1/when-to-escalate/results/run.json) |
-| the 16 misses, worked through | [`results/wrong-decisions.md`](week1/when-to-escalate/results/wrong-decisions.md) |
-| one decision reasoned out by hand | [`decisions/probability-decision-record.md`](week1/when-to-escalate/decisions/probability-decision-record.md) |
-| every design choice, and why | [`build-log.md`](week1/when-to-escalate/build-log.md) |
-| the paper | [`paper/main.tex`](week1/when-to-escalate/paper/main.tex) |
+| the policy, belief, and cost matrix | [`src/costs.py`](when-to-escalate/src/costs.py), [`src/belief.py`](when-to-escalate/src/belief.py) |
+| the run every number above comes from | [`results/run.md`](when-to-escalate/results/run.md), [`results/run.json`](when-to-escalate/results/run.json) |
+| the 16 misses, worked through | [`results/wrong-decisions.md`](when-to-escalate/results/wrong-decisions.md) |
+| one decision reasoned out by hand | [`decisions/probability-decision-record.md`](when-to-escalate/decisions/probability-decision-record.md) |
+| every design choice, and why | [`build-log.md`](when-to-escalate/build-log.md) |
+| the paper | [`paper/main.tex`](when-to-escalate/paper/main.tex) |
 
 Beliefs come from `gpt-4o-mini`. The cache behind the reported numbers is
 committed, so every number above is reproducible without calling the model again.
