@@ -52,8 +52,8 @@ Graded deliverables:
   `wrong-decisions.md` (the five-failure analysis). `wrong-decisions.md` carries a
   `## Corrections` section: four claims in it were corrected after the run was
   analysed, and the original wording is struck rather than deleted.
-- `social/` — the LinkedIn post and the X thread. **Both are still section
-  skeletons, not written posts.**
+- `social/` — the LinkedIn post and the X thread, both as published. Each file
+  opens with the live URL to the posted version.
 
 Working files, not graded:
 
